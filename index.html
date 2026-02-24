@@ -10,27 +10,31 @@
 
 <div class="app">
 
-  <!-- PRINCIPAL -->
+  <!-- ===== PANTALLA PRINCIPAL ===== -->
   <div id="mainScreen">
 
     <div class="balanceBox">
       <div id="balance" class="balance">$0</div>
+
       <div class="subInfo">
-        Deuda: <span id="debt">0</span><br>
+        Préstamos pendientes: <span id="loanTotal">0</span><br>
+        Deudas pendientes: <span id="debtTotal">0</span><br>
         Balance real: <span id="realBalance">0</span>
       </div>
     </div>
 
+    <!-- Monto -->
     <input type="number" id="amount" placeholder="Monto">
+
+    <!-- Descripción -->
     <input type="text" id="description" placeholder="Descripción (opcional)">
 
-    <div class="loanToggle">
-      <span>Préstamo</span>
-      <label class="switch">
-        <input type="checkbox" id="isLoan">
-        <span class="slider"></span>
-      </label>
-    </div>
+    <!-- Tipo operación -->
+    <select id="operationType">
+      <option value="normal">Normal</option>
+      <option value="loan">Préstamo</option>
+      <option value="debt">Deuda</option>
+    </select>
 
     <div class="buttons">
       <button id="incomeBtn" class="income">Ingreso</button>
@@ -38,15 +42,12 @@
     </div>
 
     <button id="viewBtn" class="secondary">Ver movimientos</button>
-
   </div>
 
-  <!-- MOVIMIENTOS -->
+  <!-- ===== MOVIMIENTOS ===== -->
   <div id="movementsScreen" class="hidden">
     <h2>Movimientos</h2>
     <div id="movementsList"></div>
-
-    <button id="downloadBtn" class="download">Descargar CSV</button>
     <button id="backBtn" class="secondary">Volver</button>
   </div>
 
