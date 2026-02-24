@@ -1,55 +1,84 @@
-/* ================= RESET BÁSICO ================= */
+/* =========================
+   RESET BASE
+========================= */
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: "Inter", Arial, sans-serif;
 }
 
-/* ================= ESTRUCTURA GENERAL ================= */
+/* =========================
+   BODY GENERAL
+========================= */
 
 body {
-  background: #111;
-  color: white;
+  background: #0f1115;
+  color: #e5e7eb;
   padding: 20px;
 }
 
+/* =========================
+   CONTENEDOR APP
+========================= */
+
 .app {
-  max-width: 420px;
+  max-width: 430px;
   margin: auto;
 }
 
-/* ================= BALANCE ================= */
+/* =========================
+   BALANCE PRINCIPAL
+========================= */
 
 .balanceBox {
-  text-align: center;
+  background: linear-gradient(145deg, #1a1d23, #111317);
+  padding: 25px;
+  border-radius: 18px;
   margin-bottom: 25px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  text-align: center;
 }
 
 .balance {
-  font-size: 42px;
-  font-weight: bold;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 .subInfo {
-  font-size: 14px;
+  margin-top: 12px;
+  font-size: 13px;
   opacity: 0.7;
-  margin-top: 5px;
+  line-height: 1.6;
 }
 
-/* ================= INPUTS ================= */
+/* =========================
+   INPUTS & SELECT
+========================= */
 
 input, select {
   width: 100%;
   padding: 14px;
   margin-bottom: 12px;
-  border-radius: 10px;
-  border: none;
-  font-size: 16px;
+  border-radius: 12px;
+  border: 1px solid #1f232b;
+  background: #1a1d23;
+  color: #fff;
+  font-size: 15px;
+  transition: 0.2s ease;
 }
 
-/* ================= BOTONES ================= */
+input:focus, select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+}
+
+/* =========================
+   BOTONES PRINCIPALES
+========================= */
 
 .buttons {
   display: flex;
@@ -60,54 +89,128 @@ input, select {
 button {
   width: 100%;
   padding: 14px;
-  border: none;
   border-radius: 12px;
-  font-size: 16px;
-  font-weight: bold;
+  border: none;
+  font-weight: 600;
+  font-size: 15px;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 
-.income { background: #2ecc71; }
-.expense { background: #e74c3c; }
-.secondary { background: #333; margin-top: 10px; }
-.download { background: #3498db; margin-top: 15px; }
+button:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
 
-.hidden { display: none; }
+/* Colores */
 
-/* ================= MOVIMIENTOS ================= */
+.income {
+  background: linear-gradient(145deg, #16a34a, #15803d);
+  color: white;
+}
+
+.expense {
+  background: linear-gradient(145deg, #dc2626, #b91c1c);
+  color: white;
+}
+
+.secondary {
+  background: #1f2937;
+  color: #cbd5e1;
+  margin-top: 10px;
+}
+
+.secondary:hover {
+  background: #374151;
+}
+
+.download {
+  background: linear-gradient(145deg, #2563eb, #1d4ed8);
+  color: white;
+  margin-top: 15px;
+}
+
+/* =========================
+   MOVIMIENTOS
+========================= */
 
 .monthHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 18px;
+}
+
+.monthHeader h2 {
+  font-size: 18px;
+  font-weight: 600;
+  text-transform: capitalize;
 }
 
 .monthHeader button {
   width: 50px;
-  font-size: 18px;
+  background: #1f2937;
+  color: #cbd5e1;
 }
 
+.monthHeader button:hover {
+  background: #374151;
+}
+
+/* =========================
+   TARJETAS MOVIMIENTO
+========================= */
+
 .movement {
-  background: #1e1e1e;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  font-size: 14px;
+  background: #16191f;
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 12px;
+  border: 1px solid #1f232b;
+  transition: 0.2s ease;
+}
+
+.movement:hover {
+  border-color: #3b82f6;
 }
 
 .movement .amount {
-  font-weight: bold;
+  font-weight: 700;
   font-size: 16px;
+  margin-bottom: 4px;
 }
 
+.movement small {
+  opacity: 0.6;
+  font-size: 12px;
+}
+
+/* =========================
+   ACCIONES EDITAR / BORRAR
+========================= */
+
 .actions {
-  margin-top: 8px;
+  margin-top: 10px;
   display: flex;
   gap: 8px;
 }
 
 .actions button {
+  padding: 6px 10px;
   font-size: 12px;
-  padding: 6px;
+  border-radius: 8px;
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+.actions button:hover {
+  background: #374151;
+}
+
+/* =========================
+   UTILIDAD
+========================= */
+
+.hidden {
+  display: none;
 }
