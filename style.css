@@ -1,4 +1,5 @@
-/* ===== RESET ===== */
+/* ================= RESET BÁSICO ================= */
+
 * {
   margin: 0;
   padding: 0;
@@ -6,7 +7,8 @@
   font-family: Arial, sans-serif;
 }
 
-/* ===== BASE ===== */
+/* ================= ESTRUCTURA GENERAL ================= */
+
 body {
   background: #111;
   color: white;
@@ -18,7 +20,8 @@ body {
   margin: auto;
 }
 
-/* ===== BALANCE ===== */
+/* ================= BALANCE ================= */
+
 .balanceBox {
   text-align: center;
   margin-bottom: 25px;
@@ -35,7 +38,8 @@ body {
   margin-top: 5px;
 }
 
-/* ===== INPUTS ===== */
+/* ================= INPUTS ================= */
+
 input, select {
   width: 100%;
   padding: 14px;
@@ -45,12 +49,14 @@ input, select {
   font-size: 16px;
 }
 
-input:focus, select:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px #3498db;
+/* ================= BOTONES ================= */
+
+.buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-/* ===== BOTONES ===== */
 button {
   width: 100%;
   padding: 14px;
@@ -59,26 +65,29 @@ button {
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  transition: 0.2s ease;
-}
-
-button:hover {
-  opacity: 0.85;
 }
 
 .income { background: #2ecc71; }
 .expense { background: #e74c3c; }
 .secondary { background: #333; margin-top: 10px; }
-
-.buttons {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
+.download { background: #3498db; margin-top: 15px; }
 
 .hidden { display: none; }
 
-/* ===== MOVIMIENTOS ===== */
+/* ================= MOVIMIENTOS ================= */
+
+.monthHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.monthHeader button {
+  width: 50px;
+  font-size: 18px;
+}
+
 .movement {
   background: #1e1e1e;
   padding: 12px;
@@ -90,12 +99,6 @@ button:hover {
 .movement .amount {
   font-weight: bold;
   font-size: 16px;
-}
-
-.movement small {
-  display: block;
-  opacity: 0.6;
-  margin-top: 5px;
 }
 
 .actions {
