@@ -10,28 +10,24 @@
 
 <div class="app">
 
-  <!-- ===== PANTALLA PRINCIPAL ===== -->
+  <!-- ================= PANTALLA PRINCIPAL ================= -->
   <div id="mainScreen">
 
     <div class="balanceBox">
-      <div id="balance" class="balance">$0</div>
-
+      <div id="balance" class="balance">$0.00</div>
       <div class="subInfo">
-        Préstamos pendientes: <span id="loanTotal">0</span><br>
-        Deudas pendientes: <span id="debtTotal">0</span><br>
-        Balance real: <span id="realBalance">0</span>
+        Préstamos: $<span id="loanTotal">0.00</span><br>
+        Deudas: $<span id="debtTotal">0.00</span><br>
+        Balance real: $<span id="realBalance">0.00</span>
       </div>
     </div>
 
-    <!-- Monto -->
     <input type="number" id="amount" placeholder="Monto">
-
-    <!-- Descripción -->
     <input type="text" id="description" placeholder="Descripción (opcional)">
 
-    <!-- Tipo operación -->
+    <!-- Tipo de operación -->
     <select id="operationType">
-      <option value="normal">Normal</option>
+      <option value="normal">Movimiento normal</option>
       <option value="loan">Préstamo</option>
       <option value="debt">Deuda</option>
     </select>
@@ -42,13 +38,26 @@
     </div>
 
     <button id="viewBtn" class="secondary">Ver movimientos</button>
+
   </div>
 
-  <!-- ===== MOVIMIENTOS ===== -->
+  <!-- ================= PANTALLA MOVIMIENTOS ================= -->
   <div id="movementsScreen" class="hidden">
-    <h2>Movimientos</h2>
+
+    <div class="monthHeader">
+      <button id="prevMonth">◀</button>
+      <h2 id="currentMonth"></h2>
+      <button id="nextMonth">▶</button>
+    </div>
+
     <div id="movementsList"></div>
+
+    <button id="downloadBtn" class="download">
+      Descargar mes actual
+    </button>
+
     <button id="backBtn" class="secondary">Volver</button>
+
   </div>
 
 </div>
