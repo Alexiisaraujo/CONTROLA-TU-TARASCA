@@ -1,38 +1,41 @@
-// =======================================
+// ============================
 // ESTADO GLOBAL
-// =======================================
+// ============================
 
 let ledger = JSON.parse(localStorage.getItem("ledger")) || [];
 let editingId = null;
+let currentDate = new Date();
+const MAX_AMOUNT = 10000000;
 
-const MAX_AMOUNT = 10000000; // Límite máximo permitido
-
-// =======================================
-// GUARDAR EN LOCALSTORAGE
-// =======================================
+// ============================
+// GUARDAR
+// ============================
 
 function save() {
   localStorage.setItem("ledger", JSON.stringify(ledger));
 }
 
-// =======================================
-// OBTENER TOTAL POR CUENTA (doble partida)
-// =======================================
+// ============================
+// OBTENER TOTAL POR CUENTA
+// ============================
 
 function getAccountTotal(account) {
-  return ledger.reduce((total, entry) => {
+  let total = 0;
+
+  ledger.forEach(entry => {
     entry.entries.forEach(e => {
       if (e.account === account) {
         total += e.debit - e.credit;
       }
     });
-    return total;
-  }, 0);
+  });
+
+  return total;
 }
 
-// =======================================
-// FORMATEO SEGURO DE DINERO
-// =======================================
+// ============================
+// FORMATEAR DINERO
+// ============================
 
 function formatMoney(value) {
   return Number(value).toLocaleString("es-AR", {
@@ -41,9 +44,9 @@ function formatMoney(value) {
   });
 }
 
-// =======================================
-// ACTUALIZAR BALANCES EN PANTALLA
-// =======================================
+// ============================
+// ACTUALIZAR BALANCES
+// ============================
 
 function updateBalances() {
 
@@ -61,9 +64,9 @@ function updateBalances() {
     caja >= 0 ? "#2ecc71" : "#e74c3c";
 }
 
-// =======================================
+// ============================
 // VALIDAR MONTO
-// =======================================
+// ============================
 
 function validateAmount(amount) {
   if (isNaN(amount) || amount <= 0) {
@@ -79,9 +82,9 @@ function validateAmount(amount) {
   return true;
 }
 
-// =======================================
-// POPUP DE PRÉSTAMO (TOTAL A PAGAR)
-// =======================================
+// ============================
+// POPUP PRÉSTAMO
+// ============================
 
 function loanPopup(principal) {
 
@@ -101,21 +104,17 @@ function loanPopup(principal) {
 
   const interestAmount = totalToPay - principal;
   const interestPercent = (interestAmount / principal) * 100;
-  const installmentValue = totalToPay / installments;
 
   return {
-    principal,
     totalToPay,
-    interestAmount,
     interestPercent: interestPercent.toFixed(2),
-    installments,
-    installmentValue
+    installments
   };
 }
 
-// =======================================
-// AGREGAR O EDITAR MOVIMIENTO
-// =======================================
+// ============================
+// AGREGAR MOVIMIENTO
+// ============================
 
 function addEntry(type) {
 
@@ -129,19 +128,16 @@ function addEntry(type) {
   const deudaActual = Math.abs(getAccountTotal("Deudas"));
   const prestamoActual = Math.abs(getAccountTotal("Prestamos"));
 
-  // No pagar si no hay saldo
   if (type === "expense" && amount > cajaActual) {
-    alert("Master no tenés plata para pagar esto.");
+    alert("No tenés saldo suficiente.");
     return;
   }
 
-  // No pagar más deuda de la que existe
   if (operationType === "debt" && type === "expense" && amount > deudaActual) {
     alert("No podés pagar más deuda de la que debés.");
     return;
   }
 
-  // No pagar más préstamo del que existe
   if (operationType === "loan" && type === "expense" && amount > prestamoActual) {
     alert("No podés pagar más préstamo del que debés.");
     return;
@@ -150,7 +146,7 @@ function addEntry(type) {
   let entries = [];
   let loanDetails = null;
 
-  // ================= NORMAL =================
+  // NORMAL
   if (operationType === "normal") {
 
     if (type === "income") {
@@ -166,7 +162,7 @@ function addEntry(type) {
     }
   }
 
-  // ================= PRÉSTAMO =================
+  // PRÉSTAMO
   if (operationType === "loan") {
 
     if (type === "income") {
@@ -188,7 +184,7 @@ function addEntry(type) {
     }
   }
 
-  // ================= DEUDA =================
+  // DEUDA
   if (operationType === "debt") {
 
     if (type === "income") {
@@ -231,55 +227,87 @@ function addEntry(type) {
   document.getElementById("description").value = "";
 }
 
-// =======================================
-// RENDER MOVIMIENTOS
-// =======================================
+// ============================
+// RENDER POR MES
+// ============================
 
 function render() {
 
   const list = document.getElementById("movementsList");
+  if (!list) return;
+
   list.innerHTML = "";
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+
+  const title = document.getElementById("currentMonth");
+  if (title) {
+    title.textContent =
+      currentDate.toLocaleString("es-AR", { month: "long", year: "numeric" });
+  }
 
   ledger.forEach(l => {
 
-    const div = document.createElement("div");
-    div.className = "movement";
+    const d = new Date(l.date);
 
-    let extra = "";
+    if (d.getFullYear() === year && d.getMonth() === month) {
 
-    if (l.loanDetails) {
-      extra = `
-        <br><small>
-        Total: $${formatMoney(l.loanDetails.totalToPay)} |
-        Interés: ${l.loanDetails.interestPercent}% |
-        Cuotas: ${l.loanDetails.installments} |
-        Valor cuota: $${formatMoney(l.loanDetails.installmentValue)}
-        </small>
+      const div = document.createElement("div");
+      div.className = "movement";
+
+      div.innerHTML = `
+        <div class="amount">
+          ${l.type === "income" ? "+" : "-"}$${formatMoney(l.amount)}
+        </div>
+        <div>${l.description || "Sin descripción"}</div>
+        <small>${d.toLocaleString()}</small>
+        <div class="actions">
+          <button data-edit="${l.id}">Editar</button>
+          <button data-delete="${l.id}">Borrar</button>
+        </div>
       `;
+
+      list.appendChild(div);
     }
-
-    div.innerHTML = `
-      <div class="amount">
-        ${l.type === "income" ? "+" : "-"}$${formatMoney(l.amount)}
-      </div>
-      <div>${l.description || "Sin descripción"}</div>
-      <small>${new Date(l.date).toLocaleString()} (${l.operationType})</small>
-      ${extra}
-      <div class="actions">
-        <button data-edit="${l.id}">Editar</button>
-        <button data-delete="${l.id}">Borrar</button>
-      </div>
-    `;
-
-    list.appendChild(div);
   });
+
+  if (list.innerHTML === "") {
+    list.innerHTML = "<p>No hay movimientos este mes.</p>";
+  }
 }
 
-// =======================================
-// EVENT DELEGATION (EDITAR Y BORRAR)
-// =======================================
+// ============================
+// CAMBIO DE PANTALLAS
+// ============================
 
-document.getElementById("movementsList").addEventListener("click", (e) => {
+document.getElementById("viewBtn").addEventListener("click", function() {
+  document.getElementById("mainScreen").classList.add("hidden");
+  document.getElementById("movementsScreen").classList.remove("hidden");
+});
+
+document.getElementById("backBtn").addEventListener("click", function() {
+  document.getElementById("movementsScreen").classList.add("hidden");
+  document.getElementById("mainScreen").classList.remove("hidden");
+});
+
+// ============================
+// BOTONES INGRESO / EGRESO
+// ============================
+
+document.getElementById("incomeBtn").addEventListener("click", function() {
+  addEntry("income");
+});
+
+document.getElementById("expenseBtn").addEventListener("click", function() {
+  addEntry("expense");
+});
+
+// ============================
+// EDITAR / BORRAR
+// ============================
+
+document.getElementById("movementsList").addEventListener("click", function(e) {
 
   if (e.target.dataset.delete) {
     const id = Number(e.target.dataset.delete);
@@ -299,29 +327,68 @@ document.getElementById("movementsList").addEventListener("click", (e) => {
 
     editingId = id;
 
-    mainScreen.classList.remove("hidden");
-    movementsScreen.classList.add("hidden");
+    document.getElementById("mainScreen").classList.remove("hidden");
+    document.getElementById("movementsScreen").classList.add("hidden");
   }
 
 });
 
-// =======================================
-// EVENTOS BOTONES
-// =======================================
+// ============================
+// CAMBIAR MES
+// ============================
 
-document.getElementById("incomeBtn").addEventListener("click", () => addEntry("income"));
-document.getElementById("expenseBtn").addEventListener("click", () => addEntry("expense"));
-
-document.getElementById("viewBtn").addEventListener("click", () => {
-  mainScreen.classList.add("hidden");
-  movementsScreen.classList.remove("hidden");
+document.getElementById("prevMonth").addEventListener("click", function() {
+  currentDate.setMonth(currentDate.getMonth() - 1);
+  render();
 });
 
-document.getElementById("backBtn").addEventListener("click", () => {
-  movementsScreen.classList.add("hidden");
-  mainScreen.classList.remove("hidden");
+document.getElementById("nextMonth").addEventListener("click", function() {
+  currentDate.setMonth(currentDate.getMonth() + 1);
+  render();
 });
 
-// =======================================
+// ============================
+// INICIALIZACIÓN
+// ============================
+
 updateBalances();
 render();
+// ============================
+// DESCARGAR MES ACTUAL EN CSV
+// ============================
+
+document.getElementById("downloadBtn").addEventListener("click", function () {
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+
+  let csv = "Fecha,Descripcion,Cuenta,Debe,Haber\n";
+
+  let movimientosDelMes = ledger.filter(l => {
+    const d = new Date(l.date);
+    return d.getFullYear() === year && d.getMonth() === month;
+  });
+
+  if (movimientosDelMes.length === 0) {
+    alert("No hay movimientos en este mes.");
+    return;
+  }
+
+  movimientosDelMes.forEach(l => {
+    l.entries.forEach(e => {
+      csv += `${l.date},"${l.description || ""}",${e.account},${e.debit},${e.credit}\n`;
+    });
+  });
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `libro_${month + 1}_${year}.csv`;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+});
