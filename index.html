@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finanzas</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- PRINCIPAL -->
+  <div id="mainScreen">
+
+    <div class="balanceBox">
+      <div id="balance" class="balance">$0</div>
+      <div class="subInfo">
+        Deuda: <span id="debt">0</span><br>
+        Balance real: <span id="realBalance">0</span>
+      </div>
+    </div>
+
+    <input type="number" id="amount" placeholder="Monto">
+    <input type="text" id="description" placeholder="Descripción (opcional)">
+
+    <div class="loanToggle">
+      <span>Préstamo</span>
+      <label class="switch">
+        <input type="checkbox" id="isLoan">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="buttons">
+      <button id="incomeBtn" class="income">Ingreso</button>
+      <button id="expenseBtn" class="expense">Egreso</button>
+    </div>
+
+    <button id="viewBtn" class="secondary">Ver movimientos</button>
+
+  </div>
+
+  <!-- MOVIMIENTOS -->
+  <div id="movementsScreen" class="hidden">
+    <h2>Movimientos</h2>
+    <div id="movementsList"></div>
+
+    <button id="downloadBtn" class="download">Descargar CSV</button>
+    <button id="backBtn" class="secondary">Volver</button>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
