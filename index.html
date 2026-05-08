@@ -7,6 +7,10 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- GOW: fondo y partículas -->
+<div id="gowBg" class="gow-bg hidden"></div>
+<canvas id="gowCanvas" class="gow-canvas hidden"></canvas>
+
 <div class="app">
 
   <!-- ===== AUTH ===== -->
@@ -148,6 +152,11 @@
       <div class="settings-section">
         <div class="settings-label" data-i18n="theme">Tema</div>
         <div class="theme-grid" id="themeGrid"></div>
+        <div id="gowImageSection" class="gow-image-section hidden">
+          <div class="settings-label" style="margin-top:14px">🩸 Imagen de fondo (pega el link)</div>
+          <input type="url" id="gowImageUrl" placeholder="https://i.imgur.com/...">
+          <button class="btn-main" id="gowImageBtn">Aplicar imagen</button>
+        </div>
       </div>
 
       <!-- IDIOMA -->

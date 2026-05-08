@@ -405,5 +405,146 @@ button:hover { transform:translateY(-2px); opacity:0.93; }
 .settings-user-info { background:var(--bg3); border-radius:12px; padding:14px; margin-bottom:12px; }
 .settings-username { font-weight:700; font-size:16px; }
 
+/* GOD OF WAR — rojo sangre y ceniza */
+[data-theme="godofwar"] {
+  --bg:           #1a0500;
+  --bg2:          #2d0a00;
+  --bg3:          #3d0c00;
+  --border:       #5c1a00;
+  --text:         #f5e6d3;
+  --text2:        #c07050;
+  --accent:       #c0392b;
+  --accent2:      #8B0000;
+  --accent-light: #ff6b4a;
+  --accent-bg:    #6b1500;
+  --income-from:  #b8860b;
+  --income-to:    #8B6914;
+  --expense-from: #c0392b;
+  --expense-to:   #8B0000;
+  --green:        #d4a017;
+  --red:          #ff6b4a;
+  --blue:         #c0a080;
+  --yellow:       #d4a017;
+  --card-green-bg:rgba(184,134,11,0.12);  --card-green-b:rgba(184,134,11,0.3);
+  --card-red-bg:  rgba(192,57,43,0.15);   --card-red-b:  rgba(192,57,43,0.35);
+  --card-blue-bg: rgba(192,160,128,0.1);  --card-blue-b: rgba(192,160,128,0.2);
+  --card-yel-bg:  rgba(212,160,23,0.12);  --card-yel-b:  rgba(212,160,23,0.3);
+  --balance-bg:   linear-gradient(145deg,#3d0c00,#1a0500);
+  --tab-active-bg:#6b1500; --tab-active-c:#ff6b4a;
+  --shadow:       0 8px 28px rgba(192,57,43,0.25);
+  --modal-bg:     #2d0a00;
+}
+
 /* ============ UTIL ============ */
 .hidden { display:none !important; }
+
+/* ================================================================
+   GOD OF WAR — fondo, partículas y animaciones
+   ================================================================ */
+
+/* Fondo con imagen difuminada */
+.gow-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  filter: blur(6px) brightness(0.28) saturate(1.4);
+  transform: scale(1.08);
+  pointer-events: none;
+  transition: background-image 0.5s ease;
+}
+
+/* Canvas partículas de brasa */
+.gow-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* La app flota encima */
+[data-theme="godofwar"] .app {
+  position: relative;
+  z-index: 2;
+}
+
+/* Input de imagen GOW */
+.gow-image-section input {
+  margin-top: 4px;
+  border-color: #5c1a00;
+}
+.gow-image-section input:focus {
+  border-color: #c0392b;
+}
+
+/* ── Animación de entrada al activar el tema ── */
+@keyframes gowReveal {
+  0%   { opacity:0; transform: translateY(18px) scale(0.97); filter: brightness(0.4); }
+  60%  { filter: brightness(1.15); }
+  100% { opacity:1; transform: translateY(0) scale(1); filter: brightness(1); }
+}
+@keyframes gowFlicker {
+  0%,100% { opacity:1; }
+  45%     { opacity:0.88; }
+  50%     { opacity:0.95; }
+  55%     { opacity:0.85; }
+}
+@keyframes gowPulseRed {
+  0%,100% { box-shadow: 0 8px 28px rgba(192,57,43,0.25); }
+  50%     { box-shadow: 0 8px 40px rgba(192,57,43,0.55), 0 0 18px rgba(192,57,43,0.2); }
+}
+@keyframes gowSlash {
+  0%   { clip-path: inset(0 100% 0 0); opacity:0; }
+  40%  { clip-path: inset(0 0% 0 0);   opacity:1; }
+  80%  { clip-path: inset(0 0% 0 0);   opacity:1; }
+  100% { clip-path: inset(0 0% 0 0);   opacity:1; }
+}
+@keyframes gowRune {
+  0%   { transform: scale(0.7) rotate(-8deg); opacity:0; }
+  60%  { transform: scale(1.08) rotate(2deg); opacity:1; }
+  100% { transform: scale(1) rotate(0deg);    opacity:1; }
+}
+@keyframes ashFall {
+  0%   { transform: translateY(-10px) rotate(0deg);   opacity: 0.7; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
+
+/* Aplicar animación de reveal a elementos cuando GOW está activo */
+[data-theme="godofwar"] .balanceBox {
+  animation: gowReveal 0.7s ease both, gowPulseRed 4s ease-in-out infinite 0.7s;
+}
+[data-theme="godofwar"] .tab-content > *:not(.balanceBox) {
+  animation: gowReveal 0.6s ease both;
+}
+[data-theme="godofwar"] .tab-content > *:nth-child(2) { animation-delay: 0.08s; }
+[data-theme="godofwar"] .tab-content > *:nth-child(3) { animation-delay: 0.16s; }
+[data-theme="godofwar"] .tab-content > *:nth-child(4) { animation-delay: 0.22s; }
+[data-theme="godofwar"] .movement {
+  animation: gowSlash 0.5s cubic-bezier(0.22,1,0.36,1) both;
+}
+[data-theme="godofwar"] .stat-card {
+  animation: gowRune 0.5s ease both;
+}
+[data-theme="godofwar"] .stat-card:nth-child(1) { animation-delay: 0s; }
+[data-theme="godofwar"] .stat-card:nth-child(2) { animation-delay: 0.1s; }
+[data-theme="godofwar"] .stat-card:nth-child(3) { animation-delay: 0.2s; }
+[data-theme="godofwar"] .stat-card:nth-child(4) { animation-delay: 0.3s; }
+[data-theme="godofwar"] .goal-card {
+  animation: gowSlash 0.45s cubic-bezier(0.22,1,0.36,1) both;
+}
+[data-theme="godofwar"] .balance {
+  animation: gowFlicker 6s ease-in-out infinite 1s;
+  text-shadow: 0 0 20px rgba(192,57,43,0.6), 0 0 40px rgba(192,57,43,0.2);
+}
+[data-theme="godofwar"] .tabs {
+  border-bottom-color: rgba(192,57,43,0.4);
+  box-shadow: 0 2px 20px rgba(192,57,43,0.15);
+}
+[data-theme="godofwar"] .btn-main,
+[data-theme="godofwar"] .income {
+  box-shadow: 0 4px 18px rgba(192,57,43,0.35);
+  animation: gowPulseRed 3s ease-in-out infinite;
+}
+

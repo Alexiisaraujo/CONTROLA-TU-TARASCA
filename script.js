@@ -160,6 +160,7 @@ const THEMES = [
   { id:"violet",   name:"Violet",   colors:["#0d0a1a","#8b5cf6","#1a1530"] },
   { id:"slate",    name:"Slate",    colors:["#0f1117","#38bdf8","#1d2436"] },
   { id:"rose",     name:"Rose",     colors:["#fff1f2","#f43f5e","#ffffff"] },
+  { id:"godofwar", name:"God of War", colors:["#1a0500","#c0392b","#3d0c00"] },
 ];
 
 // ================================================================
@@ -210,7 +211,110 @@ function applyI18n() {
 // ================================================================
 function applyTheme(themeId) {
   document.documentElement.setAttribute("data-theme", themeId);
+  const isGow = themeId === "godofwar";
+  document.getElementById("gowBg").classList.toggle("hidden", !isGow);
+  document.getElementById("gowCanvas").classList.toggle("hidden", !isGow);
+  if (isGow) {
+    startGowEmbers();
+    applyGowImage(prefs.gowImage || "");
+  } else {
+    stopGowEmbers();
+  }
 }
+
+// ── Fondo GOW ──
+function applyGowImage(url) {
+  const bg = document.getElementById("gowBg");
+  if (url && url.startsWith("http")) {
+    bg.style.backgroundImage = `url('${url}')`;
+  } else {
+    bg.style.backgroundImage = "none";
+    bg.style.background = "radial-gradient(ellipse at 50% 80%, #5c0a00 0%, #1a0500 60%, #0d0000 100%)";
+  }
+}
+
+// ── Partículas de brasa/ceniza ──
+let gowAnimId = null;
+const gowParticles = [];
+
+function startGowEmbers() {
+  const canvas = document.getElementById("gowCanvas");
+  const ctx    = canvas.getContext("2d");
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  // Crear brasas iniciales
+  gowParticles.length = 0;
+  for (let i = 0; i < 55; i++) spawnEmber(canvas, true);
+
+  function spawnEmber(c, random) {
+    const types = ["ember","ash","spark"];
+    const type  = types[Math.floor(Math.random() * types.length)];
+    gowParticles.push({
+      x:    Math.random() * c.width,
+      y:    random ? Math.random() * c.height : c.height + 10,
+      size: type === "ash" ? Math.random() * 3 + 1 : Math.random() * 2.5 + 0.5,
+      vy:   -(Math.random() * 0.8 + 0.3),
+      vx:   (Math.random() - 0.5) * 0.5,
+      alpha: Math.random() * 0.7 + 0.3,
+      decay: Math.random() * 0.003 + 0.001,
+      color: type === "spark"
+        ? `hsl(${Math.random()*30 + 10}, 100%, ${Math.random()*30+60}%)`
+        : type === "ember"
+        ? `hsl(${Math.random()*20 + 5}, 90%, 55%)`
+        : `rgba(180,120,80,${Math.random()*0.5+0.2})`,
+      flicker: Math.random() * Math.PI * 2,
+      type,
+    });
+  }
+
+  function loop() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = gowParticles.length - 1; i >= 0; i--) {
+      const p = gowParticles[i];
+      p.flicker += 0.06;
+      p.x  += p.vx + Math.sin(p.flicker * 0.7) * 0.3;
+      p.y  += p.vy;
+      p.alpha -= p.decay;
+      if (p.alpha <= 0 || p.y < -10) {
+        gowParticles.splice(i, 1);
+        spawnEmber(canvas, false);
+        continue;
+      }
+      ctx.save();
+      ctx.globalAlpha = p.alpha * (0.85 + Math.sin(p.flicker) * 0.15);
+      if (p.type === "ash") {
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.ellipse(p.x, p.y, p.size, p.size * 0.5, p.flicker, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.shadowBlur  = p.type === "spark" ? 8 : 5;
+        ctx.shadowColor = p.color;
+        ctx.fillStyle   = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+    gowAnimId = requestAnimationFrame(loop);
+  }
+
+  if (gowAnimId) cancelAnimationFrame(gowAnimId);
+  loop();
+}
+
+function stopGowEmbers() {
+  if (gowAnimId) { cancelAnimationFrame(gowAnimId); gowAnimId = null; }
+  gowParticles.length = 0;
+  const canvas = document.getElementById("gowCanvas");
+  canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+}
+
 
 function buildThemeGrid() {
   const grid = document.getElementById("themeGrid");
@@ -225,6 +329,10 @@ function buildThemeGrid() {
       saveUserPrefs(currentUser, prefs);
       applyTheme(th.id);
       buildThemeGrid();
+      document.getElementById("gowImageSection").classList.toggle("hidden", th.id !== "godofwar");
+      if (th.id === "godofwar") {
+        document.getElementById("gowImageUrl").value = prefs.gowImage || "";
+      }
     });
     grid.appendChild(sw);
   });
@@ -350,7 +458,13 @@ function initAppListeners() {
       if (tab === "movements") { applyI18n(); renderMovements(); }
       if (tab === "stats")     { applyI18n(); renderStats(); }
       if (tab === "goals")     { applyI18n(); renderGoals(); }
-      if (tab === "settings")  { applyI18n(); buildThemeGrid(); updateSettingsUI(); }
+      if (tab === "settings")  {
+        applyI18n();
+        buildThemeGrid();
+        updateSettingsUI();
+        document.getElementById("gowImageSection").classList.toggle("hidden", prefs.theme !== "godofwar");
+        if (prefs.theme === "godofwar") document.getElementById("gowImageUrl").value = prefs.gowImage || "";
+      }
     });
   });
 
@@ -410,6 +524,14 @@ function initAppListeners() {
     saveUserPrefs(currentUser, prefs);
     updateBalances(); renderUpcoming();
     document.querySelectorAll("#currencyRow .option-btn").forEach(b => b.classList.toggle("active", b.dataset.currency === prefs.currency));
+  });
+
+  // SETTINGS — imagen God of War
+  document.getElementById("gowImageBtn").addEventListener("click", () => {
+    const url = document.getElementById("gowImageUrl").value.trim();
+    prefs.gowImage = url;
+    saveUserPrefs(currentUser, prefs);
+    applyGowImage(url);
   });
 
   // SETTINGS — eliminar cuenta
