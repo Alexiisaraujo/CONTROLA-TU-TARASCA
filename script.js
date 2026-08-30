@@ -14,7 +14,7 @@ const I18N = {
     income:"Ingreso", expense:"Egreso",
     monthSummary:"Resumen del mes", net:"Neto", movements:"Movimientos",
     last6months:"Últimos 6 meses", topExpenses:"Gastos más grandes",
-    myGoals:"Mis metas de ahorro", addGoal:"+ Agregar meta",
+    myGoals:"Mis metas de ahorro", addGoal:"Agregar meta",
     goalNamePh:"Nombre (ej: Vacaciones)", goalTargetPh:"Cuánto querés ahorrar", goalSavedPh:"Ya tengo... (opcional)",
     settings:"Configuración", theme:"Tema", language:"Idioma",
     currency:"Moneda", account:"Cuenta", deleteAccount:"Eliminar cuenta",
@@ -49,6 +49,20 @@ const I18N = {
     achieved:"¡Logrado!",
     loanInfoPct:"de interés total",
     loanInfoMonth:"cuota mensual aprox.",
+    fixedBillsTitle:"Cuentas fijas", fixedBillsSubtitle:"Gastos obligatorios que se repiten cada mes, con fecha de vencimiento.",
+    billNamePh:"Nombre (ej: Alquiler)", billAmountPh:"Monto mensual", billDueDayPh:"Día de vencimiento (1-31)",
+    addBill:"Agregar cuenta fija",
+    catRent:"Alquiler", catWater:"Agua", catElectricity:"Luz", catInternet:"Internet", catPhone:"Teléfono", catOther:"Otro",
+    billDueDayLabel:"Vence el día", every:"Cada mes",
+    statusPaid:"Pagado", statusPending:"Pendiente", statusSoon:"Próximo", statusOverdue:"Vencido",
+    markBillPaid:"Marcar como pagado", markedPaid:"Ya pagado este mes",
+    dueToday:"Vence hoy", dueInDaysBill:"Vence en", overdueBy:"Vencido hace",
+    days:"días", day:"día",
+    noBillsList:"Todavía no cargaste ninguna cuenta fija.",
+    confirmDeleteBill:"¿Eliminar esta cuenta fija?",
+    errBillName:"Ingresá un nombre.", errBillAmount:"Ingresá un monto válido.", errBillDueDay:"Ingresá un día entre 1 y 31.",
+    upcomingBillsTitle:"Cuentas próximas a vencer",
+    noPendingBills:"Sin vencimientos próximos.",
   },
   pt: {
     appName:"Finanças", login:"Entrar", register:"Cadastrar",
@@ -62,7 +76,7 @@ const I18N = {
     income:"Receita", expense:"Despesa",
     monthSummary:"Resumo do mês", net:"Líquido", movements:"Movimentações",
     last6months:"Últimos 6 meses", topExpenses:"Maiores despesas",
-    myGoals:"Minhas metas", addGoal:"+ Adicionar meta",
+    myGoals:"Minhas metas", addGoal:"Adicionar meta",
     goalNamePh:"Nome (ex: Viagem)", goalTargetPh:"Quanto quer guardar", goalSavedPh:"Já tenho... (opcional)",
     settings:"Configurações", theme:"Tema", language:"Idioma",
     currency:"Moeda", account:"Conta", deleteAccount:"Excluir conta",
@@ -97,6 +111,20 @@ const I18N = {
     achieved:"Conquistado!",
     loanInfoPct:"de juros total",
     loanInfoMonth:"parcela mensal aprox.",
+    fixedBillsTitle:"Contas fixas", fixedBillsSubtitle:"Gastos obrigatórios que se repetem todo mês, com data de vencimento.",
+    billNamePh:"Nome (ex: Aluguel)", billAmountPh:"Valor mensal", billDueDayPh:"Dia de vencimento (1-31)",
+    addBill:"Adicionar conta fixa",
+    catRent:"Aluguel", catWater:"Água", catElectricity:"Luz", catInternet:"Internet", catPhone:"Telefone", catOther:"Outro",
+    billDueDayLabel:"Vence no dia", every:"Todo mês",
+    statusPaid:"Pago", statusPending:"Pendente", statusSoon:"Próximo", statusOverdue:"Vencido",
+    markBillPaid:"Marcar como pago", markedPaid:"Já pago este mês",
+    dueToday:"Vence hoje", dueInDaysBill:"Vence em", overdueBy:"Vencido há",
+    days:"dias", day:"dia",
+    noBillsList:"Você ainda não cadastrou nenhuma conta fixa.",
+    confirmDeleteBill:"Excluir esta conta fixa?",
+    errBillName:"Informe um nome.", errBillAmount:"Informe um valor válido.", errBillDueDay:"Informe um dia entre 1 e 31.",
+    upcomingBillsTitle:"Contas próximas do vencimento",
+    noPendingBills:"Sem vencimentos próximos.",
   },
   en: {
     appName:"Finance", login:"Sign In", register:"Sign Up",
@@ -110,7 +138,7 @@ const I18N = {
     income:"Income", expense:"Expense",
     monthSummary:"Month summary", net:"Net", movements:"Movements",
     last6months:"Last 6 months", topExpenses:"Biggest expenses",
-    myGoals:"My savings goals", addGoal:"+ Add goal",
+    myGoals:"My savings goals", addGoal:"Add goal",
     goalNamePh:"Name (e.g. Vacation)", goalTargetPh:"How much to save", goalSavedPh:"Already have... (optional)",
     settings:"Settings", theme:"Theme", language:"Language",
     currency:"Currency", account:"Account", deleteAccount:"Delete account",
@@ -145,6 +173,20 @@ const I18N = {
     achieved:"Achieved!",
     loanInfoPct:"total interest",
     loanInfoMonth:"monthly installment approx.",
+    fixedBillsTitle:"Fixed bills", fixedBillsSubtitle:"Mandatory expenses that repeat every month, with a due date.",
+    billNamePh:"Name (e.g. Rent)", billAmountPh:"Monthly amount", billDueDayPh:"Due day (1-31)",
+    addBill:"Add fixed bill",
+    catRent:"Rent", catWater:"Water", catElectricity:"Electricity", catInternet:"Internet", catPhone:"Phone", catOther:"Other",
+    billDueDayLabel:"Due day", every:"Every month",
+    statusPaid:"Paid", statusPending:"Pending", statusSoon:"Upcoming", statusOverdue:"Overdue",
+    markBillPaid:"Mark as paid", markedPaid:"Already paid this month",
+    dueToday:"Due today", dueInDaysBill:"Due in", overdueBy:"Overdue by",
+    days:"days", day:"day",
+    noBillsList:"You haven't added any fixed bills yet.",
+    confirmDeleteBill:"Delete this fixed bill?",
+    errBillName:"Enter a name.", errBillAmount:"Enter a valid amount.", errBillDueDay:"Enter a day between 1 and 31.",
+    upcomingBillsTitle:"Bills due soon",
+    noPendingBills:"No upcoming due dates.",
   }
 };
 
@@ -164,6 +206,18 @@ const THEMES = [
 ];
 
 // ================================================================
+// CATEGORÍAS DE CUENTAS FIJAS
+// ================================================================
+const BILL_CATEGORIES = {
+  rent:        { icon:"fa-house",           labelKey:"catRent" },
+  water:       { icon:"fa-droplet",         labelKey:"catWater" },
+  electricity: { icon:"fa-bolt",            labelKey:"catElectricity" },
+  internet:    { icon:"fa-wifi",            labelKey:"catInternet" },
+  phone:       { icon:"fa-mobile-screen",   labelKey:"catPhone" },
+  other:       { icon:"fa-file-invoice",    labelKey:"catOther" },
+};
+
+// ================================================================
 // STORAGE HELPERS
 // ================================================================
 function getUsers()               { return JSON.parse(localStorage.getItem("fin_users") || "{}"); }
@@ -175,6 +229,8 @@ function getLedger(u)             { return JSON.parse(localStorage.getItem("fin_
 function saveLedger(u, d)         { localStorage.setItem("fin_ledger_" + u, JSON.stringify(d)); }
 function getGoals(u)              { return JSON.parse(localStorage.getItem("fin_goals_" + u) || "[]"); }
 function saveGoals(u, d)          { localStorage.setItem("fin_goals_" + u, JSON.stringify(d)); }
+function getBills(u)              { return JSON.parse(localStorage.getItem("fin_bills_" + u) || "[]"); }
+function saveBills(u, d)          { localStorage.setItem("fin_bills_" + u, JSON.stringify(d)); }
 function getUserPrefs(u)          { return JSON.parse(localStorage.getItem("fin_prefs_" + u) || "{}"); }
 function saveUserPrefs(u, p)      { localStorage.setItem("fin_prefs_" + u, JSON.stringify(p)); }
 
@@ -184,6 +240,8 @@ function saveUserPrefs(u, p)      { localStorage.setItem("fin_prefs_" + u, JSON.
 let currentUser = null;
 let ledger      = [];
 let goals       = [];
+let bills       = [];
+let selectedBillCat = "rent";
 let prefs       = { theme:"obsidian", lang:"es", currency:"ARS", symbol:"$" };
 let editingId   = null;
 let currentDate = new Date();
@@ -375,8 +433,10 @@ document.getElementById("tabRegisterBtn").addEventListener("click", () => {
 document.querySelectorAll(".eye-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     const inp = document.getElementById(btn.dataset.target);
+    const icon = btn.querySelector("i");
     inp.type = inp.type === "password" ? "text" : "password";
-    btn.textContent = inp.type === "password" ? "👁" : "🙈";
+    icon.classList.toggle("fa-eye", inp.type === "password");
+    icon.classList.toggle("fa-eye-slash", inp.type === "text");
   });
 });
 
@@ -420,11 +480,12 @@ function launchApp(username) {
   currentUser = username;
   ledger      = getLedger(username);
   goals       = getGoals(username);
+  bills       = getBills(username);
   prefs       = { theme:"obsidian", lang:"es", currency:"ARS", symbol:"$", ...getUserPrefs(username) };
 
   document.getElementById("authScreen").classList.add("hidden");
   document.getElementById("appRoot").classList.remove("hidden");
-  document.getElementById("topbarName").textContent = "👤 " + username;
+  document.getElementById("topbarName").innerHTML = '<i class="fa-solid fa-user"></i> ' + username;
   document.getElementById("settingsUsername").textContent = username;
 
   applyTheme(prefs.theme);
@@ -432,6 +493,7 @@ function launchApp(username) {
   updateSettingsUI();
   updateBalances();
   renderUpcoming();
+  renderUpcomingBills();
   initAppListeners();
 }
 
@@ -439,7 +501,7 @@ function initAppListeners() {
   // LOGOUT
   document.getElementById("logoutBtn").addEventListener("click", () => {
     if (!confirm(t("confirmLogout"))) return;
-    clearSession(); currentUser = null; ledger = []; goals = []; editingId = null;
+    clearSession(); currentUser = null; ledger = []; goals = []; bills = []; editingId = null;
     document.getElementById("appRoot").classList.add("hidden");
     document.getElementById("authScreen").classList.remove("hidden");
     document.getElementById("loginUser").value = "";
@@ -457,6 +519,7 @@ function initAppListeners() {
       document.getElementById("tab-" + tab).classList.remove("hidden");
       if (tab === "movements") { applyI18n(); renderMovements(); }
       if (tab === "stats")     { applyI18n(); renderStats(); }
+      if (tab === "bills")     { applyI18n(); renderBills(); }
       if (tab === "goals")     { applyI18n(); renderGoals(); }
       if (tab === "settings")  {
         applyI18n();
@@ -474,13 +537,16 @@ function initAppListeners() {
 
   // MOVIMIENTOS
   document.getElementById("movementsList").addEventListener("click", e => {
-    if (e.target.dataset.delete) {
+    const delBtn  = e.target.closest("[data-delete]");
+    const editBtn = e.target.closest("[data-edit]");
+    if (delBtn) {
       if (!confirm(t("confirmDelete"))) return;
-      ledger = ledger.filter(l => l.id !== Number(e.target.dataset.delete));
+      ledger = ledger.filter(l => l.id !== Number(delBtn.dataset.delete));
       saveLedger(currentUser, ledger); renderMovements(); updateBalances();
+      return;
     }
-    if (e.target.dataset.edit) {
-      const entry = ledger.find(l => l.id === Number(e.target.dataset.edit));
+    if (editBtn) {
+      const entry = ledger.find(l => l.id === Number(editBtn.dataset.edit));
       if (!entry) return;
       document.getElementById("amount").value = entry.amount;
       document.getElementById("description").value = entry.description;
@@ -501,6 +567,17 @@ function initAppListeners() {
   // METAS
   document.getElementById("addGoalBtn").addEventListener("click", addGoal);
   document.getElementById("goalsList").addEventListener("click", handleGoalClick);
+
+  // CUENTAS FIJAS
+  document.getElementById("billCatGrid").addEventListener("click", e => {
+    const btn = e.target.closest(".bill-cat-btn");
+    if (!btn) return;
+    selectedBillCat = btn.dataset.cat;
+    document.querySelectorAll(".bill-cat-btn").forEach(b => b.classList.toggle("active", b === btn));
+  });
+  document.getElementById("addBillBtn").addEventListener("click", addBill);
+  document.getElementById("billsList").addEventListener("click", handleBillClick);
+  document.getElementById("upcomingBills").addEventListener("click", handleBillClick);
 
   // SETTINGS — tema
   document.getElementById("themeGrid").addEventListener("click", () => {}); // handled in buildThemeGrid
@@ -542,9 +619,10 @@ function initAppListeners() {
     saveUsers(users);
     localStorage.removeItem("fin_ledger_" + currentUser);
     localStorage.removeItem("fin_goals_"  + currentUser);
+    localStorage.removeItem("fin_bills_"  + currentUser);
     localStorage.removeItem("fin_prefs_"  + currentUser);
     clearSession();
-    currentUser = null; ledger = []; goals = [];
+    currentUser = null; ledger = []; goals = []; bills = [];
     document.getElementById("appRoot").classList.add("hidden");
     document.getElementById("authScreen").classList.remove("hidden");
   });
@@ -754,9 +832,9 @@ function renderUpcoming() {
 
     html += `
     <div class="upcoming-card">
-      <div class="upcoming-loan-name">💳 ${u.loan.description || t("loan")}</div>
+      <div class="upcoming-loan-name"><i class="fa-solid fa-credit-card" style="margin-right:8px;opacity:0.8"></i>${u.loan.description || t("loan")}</div>
       <div class="upcoming-row ${alert ? "alert" : ""}">
-        <span>${t("dueOn")}</span><span>${dateStr} ${alert ? "⚠️ " + u.diffDays + "d" : ""}</span>
+        <span>${t("dueOn")}</span><span>${dateStr} ${alert ? '<i class="fa-solid fa-triangle-exclamation"></i> ' + u.diffDays + "d" : ""}</span>
       </div>
       <div class="upcoming-row">
         <span>${t("installmentOf")} ${u.paidCount + 1} ${t("of")} ${totalInst}</span>
@@ -776,7 +854,7 @@ function renderUpcoming() {
         <div class="goal-percent">${pct}% ${t("paidSoFar").toLowerCase()}</div>
       </div>
       <button style="margin-top:10px;background:var(--bg3);color:var(--text);border-radius:10px;padding:8px;font-size:13px;width:100%"
-        data-payloan="${u.loan.id}">✅ Marcar cuota ${u.paidCount+1} como pagada</button>
+        data-payloan="${u.loan.id}"><i class="fa-solid fa-check"></i> Marcar cuota ${u.paidCount+1} como pagada</button>
     </div>`;
   });
   container.innerHTML = html;
@@ -821,7 +899,7 @@ function renderMovements() {
     if (l.loanDetails) {
       const paid = l.loanDetails.schedule ? l.loanDetails.schedule.filter(s=>s.paid).length : 0;
       loanInfo = `<div style="font-size:11px;color:var(--text2);margin-top:4px">
-        📅 ${paid}/${l.loanDetails.installments} cuotas · ${l.loanDetails.interestPercent}% interés · ${fmtMoney(l.loanDetails.monthly)}/mes
+        <i class="fa-regular fa-calendar"></i> ${paid}/${l.loanDetails.installments} cuotas · ${l.loanDetails.interestPercent}% interés · ${fmtMoney(l.loanDetails.monthly)}/mes
       </div>`;
     }
 
@@ -833,8 +911,8 @@ function renderMovements() {
       ${loanInfo}
       <small>${d.toLocaleString("es-AR")}</small>
       <div class="actions">
-        <button data-edit="${l.id}">✏️</button>
-        <button data-delete="${l.id}">🗑️</button>
+        <button data-edit="${l.id}"><i class="fa-solid fa-pen"></i></button>
+        <button data-delete="${l.id}"><i class="fa-solid fa-trash-can"></i></button>
       </div>`;
     list.appendChild(div);
   });
@@ -948,32 +1026,207 @@ function renderGoals() {
     const card=document.createElement("div");
     card.className="goal-card";
     card.innerHTML=`
-      <div class="goal-header"><span class="goal-name">${g.name}</span><button class="goal-delete" data-gdelete="${g.id}">✕</button></div>
+      <div class="goal-header"><span class="goal-name">${g.name}</span><button class="goal-delete" data-gdelete="${g.id}"><i class="fa-solid fa-xmark"></i></button></div>
       <div class="goal-amounts">${fmtMoney(g.saved)} de ${fmtMoney(g.target)}${done?" · ✅ "+t("achieved"):""}</div>
       <div class="goal-bar-wrap"><div class="goal-bar-fill ${done?"done":""}" style="width:${pct}%"></div></div>
       <div class="goal-percent">${pct}%</div>
       <div class="goal-add-row">
         <input type="number" placeholder="${t("amount")}" data-gadd="${g.id}" min="0">
-        <button data-gadd-btn="${g.id}">+</button>
+        <button data-gadd-btn="${g.id}"><i class="fa-solid fa-plus"></i></button>
       </div>`;
     list.appendChild(card);
   });
 }
 
 function handleGoalClick(e) {
-  if (e.target.dataset.gdelete) {
+  const delBtn = e.target.closest("[data-gdelete]");
+  const addBtn = e.target.closest("[data-gadd-btn]");
+  if (delBtn) {
     if (!confirm(t("confirmDeleteGoal"))) return;
-    goals = goals.filter(g => g.id !== Number(e.target.dataset.gdelete));
+    goals = goals.filter(g => g.id !== Number(delBtn.dataset.gdelete));
     saveGoals(currentUser, goals); renderGoals();
   }
-  if (e.target.dataset.gaddBtn) {
-    const id=Number(e.target.dataset.gaddBtn);
+  if (addBtn) {
+    const id=Number(addBtn.dataset.gaddBtn);
     const input=document.querySelector(`[data-gadd="${id}"]`);
     const val=Number(input.value);
     if (!val||val<=0){ input.focus(); return; }
     goals=goals.map(g=>g.id===id?{...g,saved:g.saved+val}:g);
     saveGoals(currentUser,goals); renderGoals(); input.value="";
   }
+}
+
+// ================================================================
+// CUENTAS FIJAS (gastos obligatorios: alquiler, agua, luz, etc.)
+// ================================================================
+function ymKey(d) { return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0"); }
+function daysInMonth(year, month) { return new Date(year, month+1, 0).getDate(); }
+
+function addBill() {
+  const name    = document.getElementById("billName").value.trim();
+  const amount  = Number(document.getElementById("billAmount").value);
+  const dueDay  = Number(document.getElementById("billDueDay").value);
+
+  if (!name)                          { alert(t("errBillName")); return; }
+  if (!amount || amount <= 0)         { alert(t("errBillAmount")); return; }
+  if (amount > MAX_AMOUNT)            { alert(t("errTooBig")); return; }
+  if (!dueDay || dueDay < 1 || dueDay > 31) { alert(t("errBillDueDay")); return; }
+
+  bills.push({ id:Date.now(), name, category:selectedBillCat, amount, dueDay, paidMonths:[] });
+  saveBills(currentUser, bills);
+  renderBills();
+  renderUpcomingBills();
+
+  document.getElementById("billName").value   = "";
+  document.getElementById("billAmount").value = "";
+  document.getElementById("billDueDay").value = "";
+}
+
+// Calcula el estado de una cuenta fija para el mes actual
+function computeBillStatus(bill) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const year = today.getFullYear(), month = today.getMonth();
+  const dueDay = Math.min(bill.dueDay, daysInMonth(year, month));
+  const dueDate = new Date(year, month, dueDay);
+  const paidThisMonth = bill.paidMonths.includes(ymKey(today));
+  const diffDays = Math.round((dueDate - today) / 86400000);
+
+  let status;
+  if (paidThisMonth)          status = "paid";
+  else if (diffDays < 0)      status = "overdue";
+  else if (diffDays <= 5)     status = "soon";
+  else                        status = "pending";
+
+  return { status, dueDate, diffDays: Math.abs(diffDays), paidThisMonth };
+}
+
+function billStatusLabel(info) {
+  if (info.status === "paid")    return `<i class="fa-solid fa-check"></i> ${t("statusPaid")}`;
+  if (info.status === "overdue") return `<i class="fa-solid fa-triangle-exclamation"></i> ${t("statusOverdue")}`;
+  if (info.status === "soon")    return `<i class="fa-solid fa-clock"></i> ${t("statusSoon")}`;
+  return t("statusPending");
+}
+
+function billDueText(info) {
+  if (info.status === "paid")    return t("markedPaid");
+  if (info.status === "overdue") return `${t("overdueBy")} ${info.diffDays} ${info.diffDays === 1 ? t("day") : t("days")}`;
+  if (info.diffDays === 0)       return t("dueToday");
+  return `${t("dueInDaysBill")} ${info.diffDays} ${info.diffDays === 1 ? t("day") : t("days")}`;
+}
+
+function renderBills() {
+  const list = document.getElementById("billsList");
+  list.innerHTML = "";
+  if (!bills.length) { list.innerHTML = `<p style="opacity:0.4;text-align:center;margin-top:16px">${t("noBillsList")}</p>`; return; }
+
+  // Ordenar por urgencia: vencido > próximo > pendiente > pagado
+  const order = { overdue:0, soon:1, pending:2, paid:3 };
+  const sorted = [...bills].sort((a,b) => order[computeBillStatus(a).status] - order[computeBillStatus(b).status]);
+
+  sorted.forEach(bill => {
+    const info = computeBillStatus(bill);
+    const cat  = BILL_CATEGORIES[bill.category] || BILL_CATEGORIES.other;
+    const dateStr = info.dueDate.toLocaleDateString("es-AR", { day:"2-digit", month:"short" });
+
+    const card = document.createElement("div");
+    card.className = "bill-card" + (info.status === "overdue" ? " is-overdue" : info.status === "soon" ? " is-soon" : "");
+    card.innerHTML = `
+      <div class="bill-head">
+        <div class="bill-cat-icon"><i class="fa-solid ${cat.icon}"></i></div>
+        <div class="bill-info">
+          <div class="bill-name">${bill.name}</div>
+          <div class="bill-amount">${fmtMoney(bill.amount)} · ${t("every")}</div>
+        </div>
+        <button class="bill-delete" data-bdelete="${bill.id}"><i class="fa-solid fa-trash-can"></i></button>
+      </div>
+      <div class="bill-due-row">
+        <span>${t("billDueDayLabel")} ${bill.dueDay} · ${dateStr}</span>
+        <span class="bill-status ${info.status}">${billStatusLabel(info)}</span>
+      </div>
+      <button class="bill-pay-btn ${info.status === "overdue" ? "urgent" : ""}" data-bpay="${bill.id}" ${info.paidThisMonth ? "disabled" : ""}>
+        <i class="fa-solid fa-check"></i> ${info.paidThisMonth ? billDueText(info) : t("markBillPaid")}
+      </button>`;
+    list.appendChild(card);
+  });
+}
+
+// Widget de "próximas a vencer" que se muestra en Inicio
+function renderUpcomingBills() {
+  const container = document.getElementById("upcomingBills");
+  if (!container) return;
+  const relevant = bills
+    .map(b => ({ bill:b, info: computeBillStatus(b) }))
+    .filter(x => x.info.status !== "paid" && (x.info.status !== "pending" || x.info.diffDays <= 10))
+    .sort((a,b) => (a.info.status === "overdue" ? -1 : 0) - (b.info.status === "overdue" ? -1 : 0) || a.info.diffDays - b.info.diffDays);
+
+  if (!relevant.length) { container.innerHTML = ""; return; }
+
+  let html = `<div class="upcoming-header">${t("upcomingBillsTitle")}</div>`;
+  relevant.forEach(({ bill, info }) => {
+    const cat = BILL_CATEGORIES[bill.category] || BILL_CATEGORIES.other;
+    html += `
+    <div class="upcoming-card ${info.status === "overdue" ? "is-overdue" : ""}">
+      <div class="upcoming-loan-name"><span class="upcoming-cat-icon"><i class="fa-solid ${cat.icon}"></i></span>${bill.name}</div>
+      <div class="upcoming-row ${info.status === "overdue" || info.status === "soon" ? "alert" : ""}">
+        <span class="bill-status ${info.status}" style="padding:3px 8px">${billStatusLabel(info)}</span>
+        <span>${fmtMoney(bill.amount)}</span>
+      </div>
+      <div class="upcoming-row"><span>${billDueText(info)}</span><span></span></div>
+      <button class="bill-pay-btn ${info.status === "overdue" ? "urgent" : ""}" style="margin-top:8px" data-bpay="${bill.id}">
+        <i class="fa-solid fa-check"></i> ${t("markBillPaid")}
+      </button>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function handleBillClick(e) {
+  const delBtn = e.target.closest("[data-bdelete]");
+  if (delBtn) {
+    if (!confirm(t("confirmDeleteBill"))) return;
+    bills = bills.filter(b => b.id !== Number(delBtn.dataset.bdelete));
+    saveBills(currentUser, bills);
+    renderBills(); renderUpcomingBills();
+    return;
+  }
+  const payBtn = e.target.closest("[data-bpay]");
+  if (payBtn) {
+    markBillPaid(Number(payBtn.dataset.bpay));
+  }
+}
+
+function markBillPaid(id) {
+  const bill = bills.find(b => b.id === id);
+  if (!bill) return;
+  const today = new Date();
+  const key = ymKey(today);
+  if (bill.paidMonths.includes(key)) return;
+
+  const caja = getAccountTotal("Caja");
+  if (bill.amount > caja) { alert(t("errNoBalance")); return; }
+
+  bill.paidMonths.push(key);
+  saveBills(currentUser, bills);
+
+  // Registrar el pago como egreso normal en el libro contable
+  const entry = {
+    id: Date.now(),
+    date: today.toISOString(),
+    description: bill.name,
+    amount: bill.amount,
+    type: "expense",
+    operationType: "normal",
+    loanDetails: null,
+    entries: [{ account:"Gastos", debit:bill.amount, credit:0 }, { account:"Caja", debit:0, credit:bill.amount }],
+  };
+  ledger.push(entry);
+  ledger.sort((a, b) => new Date(b.date) - new Date(a.date));
+  saveLedger(currentUser, ledger);
+
+  updateBalances();
+  renderBills();
+  renderUpcomingBills();
+  if (!document.getElementById("tab-movements").classList.contains("hidden")) renderMovements();
 }
 
 // ================================================================
