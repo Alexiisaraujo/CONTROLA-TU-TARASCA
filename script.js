@@ -44,6 +44,10 @@ const I18N = {
     errPasswordMatch:"Las contraseñas no coinciden.",
     errUserExists:"Ese usuario ya existe.",
     errUserNotFound:"Usuario o contraseña incorrectos.",
+    errTooManyRequests:"Demasiados intentos. Probá de nuevo en un momento.",
+    errNetwork:"No hay conexión a internet. Probá de nuevo.",
+    errGeneric:"Ocurrió un error. Probá de nuevo.",
+    reenterPassword:"Por seguridad, volvé a ingresar tu contraseña:",
     errGoalName:"Ingresá un nombre.", errGoalTarget:"Ingresá un monto objetivo.",
     errGoalSaved:"Ya tenés más de lo que querés ahorrar!",
     achieved:"¡Logrado!",
@@ -106,6 +110,10 @@ const I18N = {
     errPasswordMatch:"As senhas não coincidem.",
     errUserExists:"Esse usuário já existe.",
     errUserNotFound:"Usuário ou senha incorretos.",
+    errTooManyRequests:"Muitas tentativas. Tente novamente em instantes.",
+    errNetwork:"Sem conexão com a internet. Tente novamente.",
+    errGeneric:"Ocorreu um erro. Tente novamente.",
+    reenterPassword:"Por segurança, digite sua senha novamente:",
     errGoalName:"Informe um nome.", errGoalTarget:"Informe um valor alvo.",
     errGoalSaved:"Você já tem mais do que quer guardar!",
     achieved:"Conquistado!",
@@ -168,6 +176,10 @@ const I18N = {
     errPasswordMatch:"Passwords don't match.",
     errUserExists:"That username already exists.",
     errUserNotFound:"Incorrect username or password.",
+    errTooManyRequests:"Too many attempts. Try again in a moment.",
+    errNetwork:"No internet connection. Please try again.",
+    errGeneric:"Something went wrong. Please try again.",
+    reenterPassword:"For security, please re-enter your password:",
     errGoalName:"Enter a name.", errGoalTarget:"Enter a target amount.",
     errGoalSaved:"You already have more than you want to save!",
     achieved:"Achieved!",
@@ -203,6 +215,7 @@ const THEMES = [
   { id:"slate",    name:"Slate",    colors:["#0f1117","#38bdf8","#1d2436"] },
   { id:"rose",     name:"Rose",     colors:["#fff1f2","#f43f5e","#ffffff"] },
   { id:"godofwar", name:"God of War", colors:["#1a0500","#c0392b","#3d0c00"] },
+  { id:"nineties", name:"90's",       colors:["#170b2e","#ff2e88","#00d9ff"] },
 ];
 
 // ================================================================
@@ -218,26 +231,63 @@ const BILL_CATEGORIES = {
 };
 
 // ================================================================
+// FIREBASE
+// ================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyCMmlvOJye1-2WsAFKd284Abv_KyNK_p_c",
+  authDomain: "controla-tu-tarasca-7130e.firebaseapp.com",
+  projectId: "controla-tu-tarasca-7130e",
+  storageBucket: "controla-tu-tarasca-7130e.firebasestorage.app",
+  messagingSenderId: "459630634222",
+  appId: "1:459630634222:web:5791f6b6617fca4dc4bfff",
+};
+firebase.initializeApp(firebaseConfig);
+const fbAuth = firebase.auth();
+const fbDb   = firebase.firestore();
+
+// La app pide "usuario" (no email). Lo convertimos a un email sintético
+// fijo para poder usar Firebase Authentication sin pedir un mail real.
+function usernameToEmail(username) { return username + "@finanzas-app.local"; }
+
+function firebaseErrorMessage(err) {
+  const map = {
+    "auth/email-already-in-use":   t("errUserExists"),
+    "auth/invalid-email":          t("errUsernameChars"),
+    "auth/weak-password":          t("errPassword"),
+    "auth/user-not-found":         t("errUserNotFound"),
+    "auth/wrong-password":         t("errUserNotFound"),
+    "auth/invalid-credential":     t("errUserNotFound"),
+    "auth/too-many-requests":      t("errTooManyRequests"),
+    "auth/network-request-failed": t("errNetwork"),
+  };
+  return (err && map[err.code]) || t("errGeneric");
+}
+
+// Empuja los cambios a Firestore (además de la copia local en localStorage,
+// que sigue funcionando como caché para que la app ande incluso sin conexión).
+function syncToCloud(partial) {
+  if (!currentUID) return;
+  fbDb.collection("users").doc(currentUID).set(partial, { merge:true })
+    .catch(err => console.error("Error al sincronizar con Firebase:", err));
+}
+
+// ================================================================
 // STORAGE HELPERS
 // ================================================================
-function getUsers()               { return JSON.parse(localStorage.getItem("fin_users") || "{}"); }
-function saveUsers(u)             { localStorage.setItem("fin_users", JSON.stringify(u)); }
-function getSession()             { return localStorage.getItem("fin_session") || null; }
-function saveSession(u)           { localStorage.setItem("fin_session", u); }
-function clearSession()           { localStorage.removeItem("fin_session"); }
 function getLedger(u)             { return JSON.parse(localStorage.getItem("fin_ledger_" + u) || "[]"); }
-function saveLedger(u, d)         { localStorage.setItem("fin_ledger_" + u, JSON.stringify(d)); }
+function saveLedger(u, d, opts)   { localStorage.setItem("fin_ledger_" + u, JSON.stringify(d)); if (!(opts && opts.skipSync)) syncToCloud({ ledger:d }); }
 function getGoals(u)              { return JSON.parse(localStorage.getItem("fin_goals_" + u) || "[]"); }
-function saveGoals(u, d)          { localStorage.setItem("fin_goals_" + u, JSON.stringify(d)); }
+function saveGoals(u, d, opts)    { localStorage.setItem("fin_goals_" + u, JSON.stringify(d)); if (!(opts && opts.skipSync)) syncToCloud({ goals:d }); }
 function getBills(u)              { return JSON.parse(localStorage.getItem("fin_bills_" + u) || "[]"); }
-function saveBills(u, d)          { localStorage.setItem("fin_bills_" + u, JSON.stringify(d)); }
+function saveBills(u, d, opts)    { localStorage.setItem("fin_bills_" + u, JSON.stringify(d)); if (!(opts && opts.skipSync)) syncToCloud({ bills:d }); }
 function getUserPrefs(u)          { return JSON.parse(localStorage.getItem("fin_prefs_" + u) || "{}"); }
-function saveUserPrefs(u, p)      { localStorage.setItem("fin_prefs_" + u, JSON.stringify(p)); }
+function saveUserPrefs(u, p, opts){ localStorage.setItem("fin_prefs_" + u, JSON.stringify(p)); if (!(opts && opts.skipSync)) syncToCloud({ prefs:p }); }
 
 // ================================================================
 // ESTADO GLOBAL
 // ================================================================
 let currentUser = null;
+let currentUID  = null;
 let ledger      = [];
 let goals       = [];
 let bills       = [];
@@ -405,15 +455,6 @@ function fmtMoney(v) {
 }
 
 // ================================================================
-// HASH SIMPLE
-// ================================================================
-function simpleHash(str) {
-  let h = 5381;
-  for (let i = 0; i < str.length; i++) { h = ((h << 5) + h) + str.charCodeAt(i); h = h & h; }
-  return h.toString(16);
-}
-
-// ================================================================
 // AUTH
 // ================================================================
 document.getElementById("tabLoginBtn").addEventListener("click", () => {
@@ -440,49 +481,91 @@ document.querySelectorAll(".eye-btn").forEach(btn => {
   });
 });
 
-document.getElementById("registerBtn").addEventListener("click", () => {
+document.getElementById("registerBtn").addEventListener("click", async () => {
   const username = document.getElementById("regUser").value.trim().toLowerCase();
   const pass     = document.getElementById("regPass").value;
   const pass2    = document.getElementById("regPass2").value;
   const errEl    = document.getElementById("regError");
+  const btn      = document.getElementById("registerBtn");
   errEl.textContent = "";
   if (!username || username.length < 3)     { errEl.textContent = t("errUsername"); return; }
   if (!/^[a-z0-9_]+$/.test(username))       { errEl.textContent = t("errUsernameChars"); return; }
   if (!pass || pass.length < 4)             { errEl.textContent = t("errPassword"); return; }
   if (pass !== pass2)                        { errEl.textContent = t("errPasswordMatch"); return; }
-  const users = getUsers();
-  if (users[username])                       { errEl.textContent = t("errUserExists"); return; }
-  users[username] = { hash: simpleHash(pass) };
-  saveUsers(users);
-  saveSession(username);
-  launchApp(username);
+
+  btn.disabled = true;
+  try {
+    const cred = await fbAuth.createUserWithEmailAndPassword(usernameToEmail(username), pass);
+    await cred.user.updateProfile({ displayName: username });
+    await fbDb.collection("users").doc(cred.user.uid).set({
+      ledger: [], goals: [], bills: [],
+      prefs: { theme:"obsidian", lang:"es", currency:"ARS", symbol:"$" },
+    });
+    // fbAuth.onAuthStateChanged se dispara solo y abre la app
+  } catch (err) {
+    errEl.textContent = firebaseErrorMessage(err);
+  } finally {
+    btn.disabled = false;
+  }
 });
 document.getElementById("regPass2").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("registerBtn").click(); });
 
-document.getElementById("loginBtn").addEventListener("click", () => {
+document.getElementById("loginBtn").addEventListener("click", async () => {
   const username = document.getElementById("loginUser").value.trim().toLowerCase();
   const pass     = document.getElementById("loginPass").value;
   const errEl    = document.getElementById("loginError");
+  const btn      = document.getElementById("loginBtn");
   errEl.textContent = "";
   if (!username) { errEl.textContent = t("errUsername"); return; }
   if (!pass)     { errEl.textContent = t("errPassword"); return; }
-  const users = getUsers();
-  if (!users[username] || users[username].hash !== simpleHash(pass)) { errEl.textContent = t("errUserNotFound"); return; }
-  saveSession(username);
-  launchApp(username);
+
+  btn.disabled = true;
+  try {
+    await fbAuth.signInWithEmailAndPassword(usernameToEmail(username), pass);
+    // fbAuth.onAuthStateChanged se dispara solo y abre la app
+  } catch (err) {
+    errEl.textContent = firebaseErrorMessage(err);
+  } finally {
+    btn.disabled = false;
+  }
 });
 document.getElementById("loginPass").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("loginBtn").click(); });
 
 // ================================================================
 // LAUNCH APP
 // ================================================================
-function launchApp(username) {
+async function launchApp(username, uid) {
   currentUser = username;
-  ledger      = getLedger(username);
-  goals       = getGoals(username);
-  bills       = getBills(username);
-  prefs       = { theme:"obsidian", lang:"es", currency:"ARS", symbol:"$", ...getUserPrefs(username) };
+  currentUID  = uid;
 
+  let data;
+  try {
+    const snap = await fbDb.collection("users").doc(uid).get();
+    if (snap.exists) {
+      data = snap.data();
+    } else {
+      data = { ledger:[], goals:[], bills:[], prefs:{ theme:"obsidian", lang:"es", currency:"ARS", symbol:"$" } };
+      await fbDb.collection("users").doc(uid).set(data);
+    }
+  } catch (err) {
+    // Sin conexión: seguimos con lo que haya en la caché local del dispositivo
+    console.error("No se pudo leer Firestore, se usa la copia local:", err);
+    data = { ledger:getLedger(username), goals:getGoals(username), bills:getBills(username), prefs:getUserPrefs(username) };
+  }
+
+  ledger = data.ledger || [];
+  goals  = data.goals  || [];
+  bills  = data.bills  || [];
+  prefs  = { theme:"obsidian", lang:"es", currency:"ARS", symbol:"$", ...(data.prefs || {}) };
+
+  // Guardamos una copia local (sin volver a mandarla a Firestore) para que la
+  // app funcione también offline y como caché rápida.
+  saveLedger(username, ledger, { skipSync:true });
+  saveGoals(username, goals, { skipSync:true });
+  saveBills(username, bills, { skipSync:true });
+  saveUserPrefs(username, prefs, { skipSync:true });
+
+  document.getElementById("loadingScreen").classList.add("hidden");
   document.getElementById("authScreen").classList.add("hidden");
   document.getElementById("appRoot").classList.remove("hidden");
   document.getElementById("topbarName").innerHTML = '<i class="fa-solid fa-user"></i> ' + username;
@@ -499,14 +582,14 @@ function launchApp(username) {
 
 function initAppListeners() {
   // LOGOUT
-  document.getElementById("logoutBtn").addEventListener("click", () => {
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
     if (!confirm(t("confirmLogout"))) return;
-    clearSession(); currentUser = null; ledger = []; goals = []; bills = []; editingId = null;
-    document.getElementById("appRoot").classList.add("hidden");
-    document.getElementById("authScreen").classList.remove("hidden");
+    editingId = null;
+    await fbAuth.signOut();
     document.getElementById("loginUser").value = "";
     document.getElementById("loginPass").value = "";
     document.getElementById("loginError").textContent = "";
+    // fbAuth.onAuthStateChanged se dispara solo y muestra la pantalla de auth
   });
 
   // TABS
@@ -612,19 +695,41 @@ function initAppListeners() {
   });
 
   // SETTINGS — eliminar cuenta
-  document.getElementById("deleteAccountBtn").addEventListener("click", () => {
+  document.getElementById("deleteAccountBtn").addEventListener("click", async () => {
     if (!confirm(t("confirmDeleteAccount"))) return;
-    const users = getUsers();
-    delete users[currentUser];
-    saveUsers(users);
+    const user = fbAuth.currentUser;
+    if (!user) return;
+
+    const doDelete = async () => {
+      await fbDb.collection("users").doc(user.uid).delete();
+      await user.delete();
+    };
+
+    try {
+      await doDelete();
+    } catch (err) {
+      if (err.code === "auth/requires-recent-login") {
+        const pass = prompt(t("reenterPassword"));
+        if (!pass) return;
+        try {
+          const cred = firebase.auth.EmailAuthProvider.credential(user.email, pass);
+          await user.reauthenticateWithCredential(cred);
+          await doDelete();
+        } catch (err2) {
+          alert(firebaseErrorMessage(err2));
+          return;
+        }
+      } else {
+        alert(firebaseErrorMessage(err));
+        return;
+      }
+    }
+
     localStorage.removeItem("fin_ledger_" + currentUser);
     localStorage.removeItem("fin_goals_"  + currentUser);
     localStorage.removeItem("fin_bills_"  + currentUser);
     localStorage.removeItem("fin_prefs_"  + currentUser);
-    clearSession();
-    currentUser = null; ledger = []; goals = []; bills = [];
-    document.getElementById("appRoot").classList.add("hidden");
-    document.getElementById("authScreen").classList.remove("hidden");
+    // fbAuth.onAuthStateChanged se dispara solo y muestra la pantalla de auth
   });
 }
 
@@ -1230,10 +1335,17 @@ function markBillPaid(id) {
 }
 
 // ================================================================
-// INICIO — sesión guardada
+// INICIO — Firebase decide si hay sesión activa (funciona en cualquier
+// dispositivo: PC, celular, etc., mientras sea el mismo usuario)
 // ================================================================
-(function init() {
-  const session = getSession();
-  const users   = getUsers();
-  if (session && users[session]) { launchApp(session); }
-})();
+fbAuth.onAuthStateChanged(async (user) => {
+  if (user) {
+    const username = user.displayName || (user.email || "").split("@")[0];
+    await launchApp(username, user.uid);
+  } else {
+    currentUser = null; currentUID = null; ledger = []; goals = []; bills = [];
+    document.getElementById("loadingScreen").classList.add("hidden");
+    document.getElementById("appRoot").classList.add("hidden");
+    document.getElementById("authScreen").classList.remove("hidden");
+  }
+});
