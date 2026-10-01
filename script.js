@@ -205,6 +205,9 @@ const I18N = {
 Object.assign(I18N.es,{google:"Continuar con Google",or:"o",tabHome:"Inicio",tabMovements:"Movimientos",tabStats:"Estadísticas",tabBills:"Cuentas",tabGoals:"Metas",tabSettings:"Ajustes",errPopupBlocked:"El navegador bloqueó la ventana de Google. Permitila e intentá de nuevo.",errDomain:"Este dominio no está autorizado en Firebase (Authentication > Configuración > Dominios autorizados).",errProviderOff:"El acceso con Google no está habilitado en Firebase.",noDesc:"Sin descripción",installmentsWord:"cuotas",interestWord:"interés",perMonth:"/mes",markInstallment:"Marcar como pagada la cuota"});
 Object.assign(I18N.pt,{google:"Continuar com Google",or:"ou",tabHome:"Início",tabMovements:"Movimentos",tabStats:"Estatísticas",tabBills:"Contas",tabGoals:"Metas",tabSettings:"Ajustes",errPopupBlocked:"O navegador bloqueou a janela do Google. Permita e tente novamente.",errDomain:"Este domínio não está autorizado no Firebase (Authentication > Configurações > Domínios autorizados).",errProviderOff:"O login com Google não está habilitado no Firebase.",noDesc:"Sem descrição",installmentsWord:"parcelas",interestWord:"juros",perMonth:"/mês",markInstallment:"Marcar como paga a parcela"});
 Object.assign(I18N.en,{google:"Continue with Google",or:"or",tabHome:"Home",tabMovements:"Movements",tabStats:"Stats",tabBills:"Bills",tabGoals:"Goals",tabSettings:"Settings",errPopupBlocked:"The browser blocked the Google window. Allow it and try again.",errDomain:"This domain isn't authorized in Firebase (Authentication > Settings > Authorized domains).",errProviderOff:"Google sign-in isn't enabled in Firebase.",noDesc:"No description",installmentsWord:"installments",interestWord:"interest",perMonth:"/mo",markInstallment:"Mark as paid installment"});
+Object.assign(I18N.es,{email:"Correo (Gmail)",errEmail:"Ingresá un correo válido.",errPassword:"La contraseña debe tener al menos 6 caracteres."});
+Object.assign(I18N.pt,{email:"E-mail (Gmail)",errEmail:"Informe um e-mail válido.",errPassword:"A senha deve ter pelo menos 6 caracteres."});
+Object.assign(I18N.en,{email:"Email (Gmail)",errEmail:"Enter a valid email.",errPassword:"Password must be at least 6 characters."});
 const LOCALES = { es:"es-AR", pt:"pt-BR", en:"en-US" };
 function loc() { return LOCALES[prefs.lang] || "es-AR"; }
 function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
@@ -255,12 +258,12 @@ const fbDb   = firebase.firestore();
 
 // La app pide "usuario" (no email). Lo convertimos a un email sintético
 // fijo para poder usar Firebase Authentication sin pedir un mail real.
-function usernameToEmail(username) { return username + "@finanzas-app.local"; }
+function usernameToEmail(v) { return v.includes("@") ? v : v + "@finanzas-app.local"; }
 
 function firebaseErrorMessage(err) {
   const map = {
     "auth/email-already-in-use":   t("errUserExists"),
-    "auth/invalid-email":          t("errUsernameChars"),
+    "auth/invalid-email":          t("errEmail"),
     "auth/weak-password":          t("errPassword"),
     "auth/user-not-found":         t("errUserNotFound"),
     "auth/wrong-password":         t("errUserNotFound"),
@@ -501,15 +504,14 @@ document.getElementById("registerBtn").addEventListener("click", async () => {
   const errEl    = document.getElementById("regError");
   const btn      = document.getElementById("registerBtn");
   errEl.textContent = "";
-  if (!username || username.length < 3)     { errEl.textContent = t("errUsername"); return; }
-  if (!/^[a-z0-9_]+$/.test(username))       { errEl.textContent = t("errUsernameChars"); return; }
-  if (!pass || pass.length < 4)             { errEl.textContent = t("errPassword"); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username)) { errEl.textContent = t("errEmail"); return; }
+  if (!pass || pass.length < 6)             { errEl.textContent = t("errPassword"); return; }
   if (pass !== pass2)                        { errEl.textContent = t("errPasswordMatch"); return; }
 
   btn.disabled = true;
   try {
     const cred = await fbAuth.createUserWithEmailAndPassword(usernameToEmail(username), pass);
-    await cred.user.updateProfile({ displayName: username });
+    await cred.user.updateProfile({ displayName: username.split("@")[0] });
     // fbAuth.onAuthStateChanged se dispara solo y abre la app
   } catch (err) {
     errEl.textContent = firebaseErrorMessage(err);
@@ -525,7 +527,7 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
   const errEl    = document.getElementById("loginError");
   const btn      = document.getElementById("loginBtn");
   errEl.textContent = "";
-  if (!username) { errEl.textContent = t("errUsername"); return; }
+  if (!username) { errEl.textContent = t("errEmail"); return; }
   if (!pass)     { errEl.textContent = t("errPassword"); return; }
 
   btn.disabled = true;
@@ -613,7 +615,8 @@ async function launchAppInner(username, uid) {
   document.getElementById("authScreen").classList.add("hidden");
   document.getElementById("appRoot").classList.remove("hidden");
   document.getElementById("topbarName").innerHTML = '<i class="fa-solid fa-user"></i> ' + esc(username);
-  document.getElementById("settingsUsername").textContent = username;
+  const u0 = fbAuth.currentUser;
+  document.getElementById("settingsUsername").textContent = (u0 && u0.email && !u0.email.endsWith("@finanzas-app.local")) ? u0.email : username;
 
   applyTheme(prefs.theme);
   applyI18n();

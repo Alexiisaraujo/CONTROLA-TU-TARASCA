@@ -37,16 +37,16 @@
         <button id="tabRegisterBtn" class="auth-tab" data-i18n="register">Registrarse</button>
       </div>
       <div id="panelLogin">
-        <input type="text" id="loginUser" data-i18n-ph="username" placeholder="Usuario" autocomplete="off">
+        <input type="email" id="loginUser" data-i18n-ph="email" placeholder="Correo (Gmail)" autocomplete="email" inputmode="email">
         <div class="pass-wrap">
-          <input type="password" id="loginPass" data-i18n-ph="password" placeholder="Contraseña" autocomplete="off">
+          <input type="password" id="loginPass" data-i18n-ph="password" placeholder="Contraseña" autocomplete="current-password">
           <button class="eye-btn" data-target="loginPass"><i class="fa-solid fa-eye"></i></button>
         </div>
         <div id="loginError" class="auth-error"></div>
         <button class="btn-main" id="loginBtn" data-i18n="login">Entrar</button>
       </div>
       <div id="panelRegister" class="hidden">
-        <input type="text" id="regUser" data-i18n-ph="username" placeholder="Nombre de usuario" autocomplete="off" maxlength="30">
+        <input type="email" id="regUser" data-i18n-ph="email" placeholder="Correo (Gmail)" autocomplete="email" inputmode="email">
         <div class="pass-wrap">
           <input type="password" id="regPass" data-i18n-ph="password" placeholder="Contraseña" autocomplete="off">
           <button class="eye-btn" data-target="regPass"><i class="fa-solid fa-eye"></i></button>
