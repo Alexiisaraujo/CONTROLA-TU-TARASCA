@@ -675,3 +675,39 @@ button:focus-visible, .theme-swatch:focus-visible { outline:2px solid var(--acce
 .row2 > div { min-width:0; }
 .field-label { display:block; text-align:left; font-size:11px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:.5px; margin:0 0 6px 2px; }
 #panelRegister select { padding:15px 12px; font-size:16px; }
+
+/* ===== Cerrar sesión ===== */
+.topbar-logout { font-size:13px; font-weight:600; gap:8px; padding:8px 12px; }
+.btn-logout { width:100%; padding:14px; border-radius:12px; background:var(--bg3); color:var(--text); font-weight:600; font-size:15px; border:1px solid var(--border); margin-top:8px; }
+
+/* ===== TEMA 16 BITS (paleta tipo SNES, fuente pixel, sombras duras) ===== */
+[data-theme="bit16"] {
+  --bg:#1a1c2c; --bg2:#262b44; --bg3:#333c57; --border:#566c86;
+  --text:#f4f4f4; --text2:#94b0c2;
+  --accent:#3b5dc9; --accent2:#29366f; --accent-light:#73eff7; --accent-bg:#29366f;
+  --income-from:#38b764; --income-to:#257179; --expense-from:#b13e53; --expense-to:#5d275d;
+  --green:#a7f070; --red:#ff6b81; --blue:#41a6f6; --yellow:#ffcd75;
+  --card-green-bg:rgba(167,240,112,.12); --card-green-b:#38b764;
+  --card-red-bg:rgba(255,107,129,.12);   --card-red-b:#b13e53;
+  --card-blue-bg:rgba(65,166,246,.12);   --card-blue-b:#3b5dc9;
+  --card-yel-bg:rgba(255,205,117,.12);   --card-yel-b:#ef7d57;
+  --balance-bg:linear-gradient(180deg,#29366f,#1a1c2c);
+  --tab-active-bg:#3b5dc9; --tab-active-c:#f4f4f4;
+  --shadow:6px 6px 0 #0b0b14; --modal-bg:#262b44; --radius-card:0;
+}
+[data-theme="bit16"] body { font-family:"Pixelify Sans","Inter",monospace; font-size:16px; background-image:linear-gradient(rgba(255,255,255,.035) 50%, transparent 50%); background-size:100% 4px; }
+[data-theme="bit16"] *:not(i) { border-radius:0 !important; }
+[data-theme="bit16"] .balanceBox, [data-theme="bit16"] .movement, [data-theme="bit16"] .upcoming-card, [data-theme="bit16"] .bill-card,
+[data-theme="bit16"] .goal-card, [data-theme="bit16"] .stat-card, [data-theme="bit16"] .settings-section, [data-theme="bit16"] .chart-wrap,
+[data-theme="bit16"] .bill-form, [data-theme="bit16"] .goal-form, [data-theme="bit16"] .modal-box, [data-theme="bit16"] .top-expense-item,
+[data-theme="bit16"] .auth-wrap, [data-theme="bit16"] .loan-preview { border:3px solid #0b0b14 !important; box-shadow:4px 4px 0 #0b0b14; }
+[data-theme="bit16"] input, [data-theme="bit16"] select { border:3px solid #0b0b14; box-shadow:inset 3px 3px 0 rgba(0,0,0,.35); }
+[data-theme="bit16"] button { border:3px solid #0b0b14; box-shadow:0 4px 0 #0b0b14; transition:none; text-transform:uppercase; letter-spacing:.5px; }
+[data-theme="bit16"] button:hover { transform:none; opacity:1; filter:brightness(1.15); }
+[data-theme="bit16"] button:active { transform:translateY(4px); box-shadow:none; }
+[data-theme="bit16"] .tabs { border:3px solid #0b0b14; box-shadow:0 0 0 #0b0b14; }
+[data-theme="bit16"] .tab { box-shadow:none; }
+[data-theme="bit16"] .goal-bar-wrap { border:2px solid #0b0b14; height:14px; }
+[data-theme="bit16"] .goal-bar-fill { transition:width .5s steps(12); }
+[data-theme="bit16"] .balance { text-shadow:3px 3px 0 #0b0b14; letter-spacing:0; }
+[data-theme="bit16"] .loading-spinner { animation-timing-function:steps(8); }

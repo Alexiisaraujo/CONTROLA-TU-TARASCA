@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Pixelify+Sans:wght@400;600;700&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-2gYnPlyGHNiaYcbYfHc/wjExl+D18eLKZTQXhaz8OFHElvLKvbjhI+kEqiIQxDfGtdz4vqcttHBrLsFdMkVdyw==" crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -93,7 +93,7 @@
   <div id="appRoot" class="hidden">
     <div class="topbar">
       <span class="topbar-name" id="topbarName"></span>
-      <button class="topbar-logout" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i></button>
+      <button class="topbar-logout" id="logoutBtn" type="button"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="logout">Cerrar sesión</span></button>
     </div>
     <nav class="tabs">
       <button class="tab active" data-tab="home"><i class="fa-solid fa-house"></i><span data-i18n="tabHome">Inicio</span></button>
@@ -231,6 +231,7 @@
         <div class="settings-user-info">
           <div class="settings-username" id="settingsUsername"></div>
         </div>
+        <button class="btn-logout" id="logoutBtn2" type="button"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="logout">Cerrar sesión</span></button>
         <button class="btn-danger" id="deleteAccountBtn"><i class="fa-solid fa-trash-can"></i> <span data-i18n="deleteAccount">Eliminar cuenta</span></button>
       </div>
 

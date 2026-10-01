@@ -211,6 +211,7 @@ Object.assign(I18N.en,{email:"Email (Gmail)",errEmail:"Enter a valid email.",err
 Object.assign(I18N.es,{firstNamePh:"Nombre",lastNamePh:"Apellido",phonePh:"Teléfono (opcional)",errName:"Ingresá tu nombre."});
 Object.assign(I18N.pt,{firstNamePh:"Nome",lastNamePh:"Sobrenome",phonePh:"Telefone (opcional)",errName:"Informe seu nome."});
 Object.assign(I18N.en,{firstNamePh:"First name",lastNamePh:"Last name",phonePh:"Phone (optional)",errName:"Enter your first name."});
+I18N.es.logout="Cerrar sesión"; I18N.pt.logout="Sair"; I18N.en.logout="Sign out";
 const LOCALES = { es:"es-AR", pt:"pt-BR", en:"en-US" };
 function loc() { return LOCALES[prefs.lang] || "es-AR"; }
 function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
@@ -229,6 +230,7 @@ const THEMES = [
   { id:"slate",    name:"Slate",    colors:["#0f1117","#38bdf8","#1d2436"] },
   { id:"rose",     name:"Rose",     colors:["#fff1f2","#f43f5e","#ffffff"] },
   { id:"godofwar", name:"God of War", colors:["#1a0500","#c0392b","#3d0c00"] },
+  { id:"bit16",    name:"16 Bits",    colors:["#1a1c2c","#3b5dc9","#ffcd75"] },
   { id:"nineties", name:"90's",       colors:["#170b2e","#ff2e88","#00d9ff"] },
 ];
 
@@ -630,6 +632,8 @@ function initAppListeners() {
     document.getElementById("loginError").textContent = "";
     // fbAuth.onAuthStateChanged se dispara solo y muestra la pantalla de auth
   });
+
+  document.getElementById("logoutBtn2").addEventListener("click", () => document.getElementById("logoutBtn").click());
 
   // TABS
   document.querySelectorAll(".tab").forEach(btn => {
