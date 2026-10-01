@@ -711,3 +711,17 @@ button:focus-visible, .theme-swatch:focus-visible { outline:2px solid var(--acce
 [data-theme="bit16"] .goal-bar-fill { transition:width .5s steps(12); }
 [data-theme="bit16"] .balance { text-shadow:3px 3px 0 #0b0b14; letter-spacing:0; }
 [data-theme="bit16"] .loading-spinner { animation-timing-function:steps(8); }
+
+/* ===== Crédito ===== */
+.app-credit { text-align:center; padding:28px 20px 32px; margin-top:12px; border-top:1px solid var(--border); color:var(--text2); font-size:13px; }
+.credit-text { font-size:14px; color:var(--text); }
+.credit-text strong { color:var(--accent-light); }
+.credit-hint { margin:6px 0 14px; font-size:12px; }
+.credit-links { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
+.credit-links a { display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:12px; background:var(--bg2); border:1px solid var(--border); color:var(--text); text-decoration:none; font-size:13px; font-weight:600; transition:.2s; }
+.credit-links a:hover { border-color:var(--accent); color:var(--accent-light); }
+.credit-links i { font-size:16px; color:var(--accent-light); }
+#authScreen:not(.hidden) ~ .app-credit, #appRoot:not(.hidden) ~ .app-credit { display:block; }
+@media (max-width:899px) { #appRoot:not(.hidden) ~ .app-credit { padding-bottom:calc(100px + env(safe-area-inset-bottom)); } }
+@media (min-width:900px) { #appRoot:not(.hidden) ~ .app-credit { margin-left:254px; } }
+[data-theme="bit16"] .credit-links a { border:3px solid #0b0b14; box-shadow:3px 3px 0 #0b0b14; border-radius:0; }

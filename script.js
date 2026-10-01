@@ -212,6 +212,8 @@ Object.assign(I18N.es,{firstNamePh:"Nombre",lastNamePh:"Apellido",phonePh:"Telé
 Object.assign(I18N.pt,{firstNamePh:"Nome",lastNamePh:"Sobrenome",phonePh:"Telefone (opcional)",errName:"Informe seu nome."});
 Object.assign(I18N.en,{firstNamePh:"First name",lastNamePh:"Last name",phonePh:"Phone (optional)",errName:"Enter your first name."});
 I18N.es.logout="Cerrar sesión"; I18N.pt.logout="Sair"; I18N.en.logout="Sign out";
+I18N.es.createdBy="Creación de"; I18N.pt.createdBy="Criação de"; I18N.en.createdBy="Created by";
+I18N.es.creditHint="¿Ideas o problemas con la app? Escribime:"; I18N.pt.creditHint="Ideias ou problemas com o app? Fale comigo:"; I18N.en.creditHint="Ideas or issues with the app? Contact me:";
 const LOCALES = { es:"es-AR", pt:"pt-BR", en:"en-US" };
 function loc() { return LOCALES[prefs.lang] || "es-AR"; }
 function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
