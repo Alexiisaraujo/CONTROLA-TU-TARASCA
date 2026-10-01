@@ -29,9 +29,6 @@
     <div class="auth-wrap">
       <div class="auth-logo"><i class="fa-solid fa-wallet"></i></div>
       <h1 class="auth-title" data-i18n="appName">Finanzas</h1>
-      <button id="googleBtn" class="btn-google" type="button"><i class="fa-brands fa-google"></i> <span data-i18n="google">Continuar con Google</span></button>
-      <div id="googleError" class="auth-error" style="text-align:center"></div>
-      <div class="auth-divider"><span data-i18n="or">o</span></div>
       <div class="auth-tabs">
         <button id="tabLoginBtn" class="auth-tab active" data-i18n="login">Entrar</button>
         <button id="tabRegisterBtn" class="auth-tab" data-i18n="register">Registrarse</button>
@@ -46,14 +43,25 @@
         <button class="btn-main" id="loginBtn" data-i18n="login">Entrar</button>
       </div>
       <div id="panelRegister" class="hidden">
+        <div class="row2">
+          <input type="text" id="regName" data-i18n-ph="firstNamePh" placeholder="Nombre" autocomplete="given-name" maxlength="30">
+          <input type="text" id="regLast" data-i18n-ph="lastNamePh" placeholder="Apellido" autocomplete="family-name" maxlength="30">
+        </div>
         <input type="email" id="regUser" data-i18n-ph="email" placeholder="Correo (Gmail)" autocomplete="email" inputmode="email">
-        <div class="pass-wrap">
-          <input type="password" id="regPass" data-i18n-ph="password" placeholder="Contraseña" autocomplete="off">
-          <button class="eye-btn" data-target="regPass"><i class="fa-solid fa-eye"></i></button>
+        <input type="tel" id="regPhone" data-i18n-ph="phonePh" placeholder="Teléfono (opcional)" autocomplete="tel" inputmode="tel" maxlength="20">
+        <div class="row2">
+          <div><label class="field-label" data-i18n="language">Idioma</label>
+            <select id="regLang"><option value="es">Español</option><option value="pt">Português</option><option value="en">English</option></select></div>
+          <div><label class="field-label" data-i18n="currency">Moneda</label>
+            <select id="regCurrency"><option value="ARS">Peso (ARS)</option><option value="BRL">Real (BRL)</option><option value="USD">Dólar (USD)</option></select></div>
         </div>
         <div class="pass-wrap">
-          <input type="password" id="regPass2" data-i18n-ph="repeatPassword" placeholder="Repetir contraseña" autocomplete="off">
-          <button class="eye-btn" data-target="regPass2"><i class="fa-solid fa-eye"></i></button>
+          <input type="password" id="regPass" data-i18n-ph="password" placeholder="Contraseña" autocomplete="new-password">
+          <button class="eye-btn" type="button" aria-label="Ver contraseña" data-target="regPass"><i class="fa-solid fa-eye"></i></button>
+        </div>
+        <div class="pass-wrap">
+          <input type="password" id="regPass2" data-i18n-ph="repeatPassword" placeholder="Repetir contraseña" autocomplete="new-password">
+          <button class="eye-btn" type="button" aria-label="Ver contraseña" data-target="regPass2"><i class="fa-solid fa-eye"></i></button>
         </div>
         <div id="regError" class="auth-error"></div>
         <button class="btn-main" id="registerBtn" data-i18n="register">Crear cuenta</button>

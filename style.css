@@ -669,3 +669,9 @@ button:focus-visible, .theme-swatch:focus-visible { outline:2px solid var(--acce
 }
 @media (max-width:380px) { .stat-value { font-size:17px; } .theme-grid { grid-template-columns:repeat(4,1fr); } .tab span { font-size:9px; } }
 @media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; } }
+
+/* ===== Registro ===== */
+.row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.row2 > div { min-width:0; }
+.field-label { display:block; text-align:left; font-size:11px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:.5px; margin:0 0 6px 2px; }
+#panelRegister select { padding:15px 12px; font-size:16px; }

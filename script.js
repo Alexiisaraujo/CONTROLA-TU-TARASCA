@@ -208,6 +208,9 @@ Object.assign(I18N.en,{google:"Continue with Google",or:"or",tabHome:"Home",tabM
 Object.assign(I18N.es,{email:"Correo (Gmail)",errEmail:"Ingresá un correo válido.",errPassword:"La contraseña debe tener al menos 6 caracteres."});
 Object.assign(I18N.pt,{email:"E-mail (Gmail)",errEmail:"Informe um e-mail válido.",errPassword:"A senha deve ter pelo menos 6 caracteres."});
 Object.assign(I18N.en,{email:"Email (Gmail)",errEmail:"Enter a valid email.",errPassword:"Password must be at least 6 characters."});
+Object.assign(I18N.es,{firstNamePh:"Nombre",lastNamePh:"Apellido",phonePh:"Teléfono (opcional)",errName:"Ingresá tu nombre."});
+Object.assign(I18N.pt,{firstNamePh:"Nome",lastNamePh:"Sobrenome",phonePh:"Telefone (opcional)",errName:"Informe seu nome."});
+Object.assign(I18N.en,{firstNamePh:"First name",lastNamePh:"Last name",phonePh:"Phone (optional)",errName:"Enter your first name."});
 const LOCALES = { es:"es-AR", pt:"pt-BR", en:"en-US" };
 function loc() { return LOCALES[prefs.lang] || "es-AR"; }
 function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
@@ -310,7 +313,7 @@ let selectedBillCat = "rent";
 let prefs       = { theme:"obsidian", lang:"es", currency:"ARS", symbol:"$" };
 let editingId   = null;
 let currentDate = new Date(); currentDate.setDate(1);
-let listenersReady = false, launching = false, loanPrincipal = 0;
+let pendingSignup = null, listenersReady = false, launching = false, loanPrincipal = 0;
 const MAX_AMOUNT = 10000000;
 
 // Pending loan modal resolve
@@ -498,27 +501,38 @@ document.querySelectorAll(".eye-btn").forEach(btn => {
 });
 
 document.getElementById("registerBtn").addEventListener("click", async () => {
-  const username = document.getElementById("regUser").value.trim().toLowerCase();
-  const pass     = document.getElementById("regPass").value;
-  const pass2    = document.getElementById("regPass2").value;
-  const errEl    = document.getElementById("regError");
-  const btn      = document.getElementById("registerBtn");
+  const first  = document.getElementById("regName").value.trim();
+  const last   = document.getElementById("regLast").value.trim();
+  const email  = document.getElementById("regUser").value.trim().toLowerCase();
+  const phone  = document.getElementById("regPhone").value.trim();
+  const lang   = document.getElementById("regLang").value;
+  const cur    = document.getElementById("regCurrency").value;
+  const pass   = document.getElementById("regPass").value;
+  const pass2  = document.getElementById("regPass2").value;
+  const errEl  = document.getElementById("regError");
+  const btn    = document.getElementById("registerBtn");
   errEl.textContent = "";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username)) { errEl.textContent = t("errEmail"); return; }
-  if (!pass || pass.length < 6)             { errEl.textContent = t("errPassword"); return; }
-  if (pass !== pass2)                        { errEl.textContent = t("errPasswordMatch"); return; }
+  if (!first)                                          { errEl.textContent = t("errName"); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))     { errEl.textContent = t("errEmail"); return; }
+  if (!pass || pass.length < 6)                        { errEl.textContent = t("errPassword"); return; }
+  if (pass !== pass2)                                  { errEl.textContent = t("errPasswordMatch"); return; }
 
+  const sym = { ARS:"$", BRL:"R$", USD:"US$" }[cur] || "$";
+  pendingSignup = { profile:{ firstName:first, lastName:last, phone, email },
+                    prefs:{ theme:"obsidian", lang, currency:cur, symbol:sym } };
   btn.disabled = true;
   try {
-    const cred = await fbAuth.createUserWithEmailAndPassword(usernameToEmail(username), pass);
-    await cred.user.updateProfile({ displayName: username.split("@")[0] });
-    // fbAuth.onAuthStateChanged se dispara solo y abre la app
+    const cred = await fbAuth.createUserWithEmailAndPassword(email, pass);
+    await cred.user.updateProfile({ displayName: first });
+    await fbDb.collection("users").doc(cred.user.uid).set(pendingSignup, { merge:true });
   } catch (err) {
+    pendingSignup = null;
     errEl.textContent = firebaseErrorMessage(err);
   } finally {
     btn.disabled = false;
   }
 });
+document.getElementById("regLang").addEventListener("change", e => { prefs.lang = e.target.value; try { localStorage.setItem("fin_lang", prefs.lang); } catch(x) {} applyI18n(); });
 document.getElementById("regPass2").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("registerBtn").click(); });
 
 document.getElementById("loginBtn").addEventListener("click", async () => {
@@ -542,35 +556,10 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 });
 document.getElementById("loginPass").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("loginBtn").click(); });
 
-// ── Google ──
-const googleProvider = new firebase.auth.GoogleAuthProvider();
-googleProvider.setCustomParameters({ prompt:"select_account" });
-function showGoogleError(err) {
-  if (!err || err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") return;
-  document.getElementById("googleError").textContent = firebaseErrorMessage(err);
-}
-document.getElementById("googleBtn").addEventListener("click", async () => {
-  const btn = document.getElementById("googleBtn");
-  document.getElementById("googleError").textContent = "";
-  btn.disabled = true;
-  try {
-    await fbAuth.signInWithPopup(googleProvider);
-  } catch (err) {
-    if (err.code === "auth/popup-blocked" || err.code === "auth/operation-not-supported-in-this-environment") {
-      try { await fbAuth.signInWithRedirect(googleProvider); return; } catch (e2) { showGoogleError(e2); }
-    } else showGoogleError(err);
-  } finally { btn.disabled = false; }
-});
-fbAuth.getRedirectResult().catch(showGoogleError);
-
 async function reauthUser(user) {
-  if (user.providerData.some(p => p.providerId === "google.com")) {
-    await user.reauthenticateWithPopup(googleProvider);
-  } else {
-    const pass = prompt(t("reenterPassword"));
-    if (!pass) throw new Error("cancel");
-    await user.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(user.email, pass));
-  }
+  const pass = prompt(t("reenterPassword"));
+  if (!pass) throw new Error("cancel");
+  await user.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(user.email, pass));
 }
 
 // ================================================================
@@ -590,7 +579,7 @@ async function launchAppInner(username, uid) {
     if (snap.exists) {
       data = snap.data();
     } else {
-      data = { ledger:[], goals:[], bills:[], prefs:{ theme:"obsidian", lang:"es", currency:"ARS", symbol:"$" } };
+      data = { ledger:[], goals:[], bills:[], prefs:{ theme:"obsidian", lang:"es", currency:"ARS", symbol:"$" }, ...(pendingSignup || {}) };
       await fbDb.collection("users").doc(uid).set(data);
     }
   } catch (err) {
@@ -599,6 +588,8 @@ async function launchAppInner(username, uid) {
     data = { ledger:getLedger(uid), goals:getGoals(uid), bills:getBills(uid), prefs:getUserPrefs(uid) };
   }
 
+  if (data.profile && data.profile.firstName) { username = (data.profile.firstName + " " + (data.profile.lastName || "")).trim(); currentUser = username; }
+  pendingSignup = null;
   ledger = data.ledger || [];
   goals  = data.goals  || [];
   bills  = data.bills  || [];
