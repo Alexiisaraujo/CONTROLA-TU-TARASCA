@@ -202,6 +202,14 @@ const I18N = {
   }
 };
 
+Object.assign(I18N.es,{google:"Continuar con Google",or:"o",tabHome:"Inicio",tabMovements:"Movimientos",tabStats:"Estadísticas",tabBills:"Cuentas",tabGoals:"Metas",tabSettings:"Ajustes",errPopupBlocked:"El navegador bloqueó la ventana de Google. Permitila e intentá de nuevo.",errDomain:"Este dominio no está autorizado en Firebase (Authentication > Configuración > Dominios autorizados).",errProviderOff:"El acceso con Google no está habilitado en Firebase.",noDesc:"Sin descripción",installmentsWord:"cuotas",interestWord:"interés",perMonth:"/mes",markInstallment:"Marcar como pagada la cuota"});
+Object.assign(I18N.pt,{google:"Continuar com Google",or:"ou",tabHome:"Início",tabMovements:"Movimentos",tabStats:"Estatísticas",tabBills:"Contas",tabGoals:"Metas",tabSettings:"Ajustes",errPopupBlocked:"O navegador bloqueou a janela do Google. Permita e tente novamente.",errDomain:"Este domínio não está autorizado no Firebase (Authentication > Configurações > Domínios autorizados).",errProviderOff:"O login com Google não está habilitado no Firebase.",noDesc:"Sem descrição",installmentsWord:"parcelas",interestWord:"juros",perMonth:"/mês",markInstallment:"Marcar como paga a parcela"});
+Object.assign(I18N.en,{google:"Continue with Google",or:"or",tabHome:"Home",tabMovements:"Movements",tabStats:"Stats",tabBills:"Bills",tabGoals:"Goals",tabSettings:"Settings",errPopupBlocked:"The browser blocked the Google window. Allow it and try again.",errDomain:"This domain isn't authorized in Firebase (Authentication > Settings > Authorized domains).",errProviderOff:"Google sign-in isn't enabled in Firebase.",noDesc:"No description",installmentsWord:"installments",interestWord:"interest",perMonth:"/mo",markInstallment:"Mark as paid installment"});
+const LOCALES = { es:loc(), pt:"pt-BR", en:"en-US" };
+function loc() { return LOCALES[prefs.lang] || loc(); }
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function localISO(d) { return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+
 // ================================================================
 // TEMAS
 // ================================================================
@@ -259,6 +267,10 @@ function firebaseErrorMessage(err) {
     "auth/invalid-credential":     t("errUserNotFound"),
     "auth/too-many-requests":      t("errTooManyRequests"),
     "auth/network-request-failed": t("errNetwork"),
+    "auth/popup-blocked":          t("errPopupBlocked"),
+    "auth/unauthorized-domain":    t("errDomain"),
+    "auth/operation-not-allowed":  t("errProviderOff"),
+    "auth/account-exists-with-different-credential": t("errUserExists"),
   };
   return (err && map[err.code]) || t("errGeneric");
 }
@@ -294,7 +306,8 @@ let bills       = [];
 let selectedBillCat = "rent";
 let prefs       = { theme:"obsidian", lang:"es", currency:"ARS", symbol:"$" };
 let editingId   = null;
-let currentDate = new Date();
+let currentDate = new Date(); currentDate.setDate(1);
+let listenersReady = false, launching = false, loanPrincipal = 0;
 const MAX_AMOUNT = 10000000;
 
 // Pending loan modal resolve
@@ -306,6 +319,7 @@ let loanModalResolve = null;
 function t(key) { return (I18N[prefs.lang] || I18N.es)[key] || key; }
 
 function applyI18n() {
+  document.title = t("appName");
   document.querySelectorAll("[data-i18n]").forEach(el => {
     el.textContent = t(el.dataset.i18n);
   });
@@ -334,7 +348,7 @@ function applyTheme(themeId) {
 function applyGowImage(url) {
   const bg = document.getElementById("gowBg");
   if (url && url.startsWith("http")) {
-    bg.style.backgroundImage = `url('${url}')`;
+    bg.style.backgroundImage = `url("${encodeURI(url).replace(/"/g, '%22')}")`;
   } else {
     bg.style.backgroundImage = "none";
     bg.style.background = "radial-gradient(ellipse at 50% 80%, #5c0a00 0%, #1a0500 60%, #0d0000 100%)";
@@ -353,7 +367,8 @@ function startGowEmbers() {
 
   // Crear brasas iniciales
   gowParticles.length = 0;
-  for (let i = 0; i < 55; i++) spawnEmber(canvas, true);
+  window.addEventListener("resize", () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+  for (let i = 0; i < (window.innerWidth < 600 ? 25 : 55); i++) spawnEmber(canvas, true);
 
   function spawnEmber(c, random) {
     const types = ["ember","ash","spark"];
@@ -377,8 +392,6 @@ function startGowEmbers() {
   }
 
   function loop() {
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (let i = gowParticles.length - 1; i >= 0; i--) {
@@ -431,10 +444,10 @@ function buildThemeGrid() {
     const sw = document.createElement("div");
     sw.className = "theme-swatch" + (prefs.theme === th.id ? " active" : "");
     sw.style.background = `linear-gradient(135deg, ${th.colors[0]} 40%, ${th.colors[1]} 100%)`;
-    sw.innerHTML = `<div class="swatch-check">✓</div><div class="theme-swatch-name">${th.name}</div>`;
+    sw.innerHTML = `<div class="swatch-check"><i class="fa-solid fa-check"></i></div><div class="theme-swatch-name">${th.name}</div>`;
     sw.addEventListener("click", () => {
       prefs.theme = th.id;
-      saveUserPrefs(currentUser, prefs);
+      saveUserPrefs(currentUID, prefs);
       applyTheme(th.id);
       buildThemeGrid();
       document.getElementById("gowImageSection").classList.toggle("hidden", th.id !== "godofwar");
@@ -451,7 +464,7 @@ function buildThemeGrid() {
 // ================================================================
 function fmtMoney(v) {
   const sym = prefs.symbol || "$";
-  return sym + Number(v).toLocaleString("es-AR", { minimumFractionDigits:2, maximumFractionDigits:2 });
+  return (Number(v) < 0 ? "-" : "") + sym + Math.abs(Number(v)).toLocaleString(loc(), { minimumFractionDigits:2, maximumFractionDigits:2 });
 }
 
 // ================================================================
@@ -497,10 +510,6 @@ document.getElementById("registerBtn").addEventListener("click", async () => {
   try {
     const cred = await fbAuth.createUserWithEmailAndPassword(usernameToEmail(username), pass);
     await cred.user.updateProfile({ displayName: username });
-    await fbDb.collection("users").doc(cred.user.uid).set({
-      ledger: [], goals: [], bills: [],
-      prefs: { theme:"obsidian", lang:"es", currency:"ARS", symbol:"$" },
-    });
     // fbAuth.onAuthStateChanged se dispara solo y abre la app
   } catch (err) {
     errEl.textContent = firebaseErrorMessage(err);
@@ -531,10 +540,45 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 });
 document.getElementById("loginPass").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("loginBtn").click(); });
 
+// ── Google ──
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt:"select_account" });
+function showGoogleError(err) {
+  if (!err || err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") return;
+  document.getElementById("googleError").textContent = firebaseErrorMessage(err);
+}
+document.getElementById("googleBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("googleBtn");
+  document.getElementById("googleError").textContent = "";
+  btn.disabled = true;
+  try {
+    await fbAuth.signInWithPopup(googleProvider);
+  } catch (err) {
+    if (err.code === "auth/popup-blocked" || err.code === "auth/operation-not-supported-in-this-environment") {
+      try { await fbAuth.signInWithRedirect(googleProvider); return; } catch (e2) { showGoogleError(e2); }
+    } else showGoogleError(err);
+  } finally { btn.disabled = false; }
+});
+fbAuth.getRedirectResult().catch(showGoogleError);
+
+async function reauthUser(user) {
+  if (user.providerData.some(p => p.providerId === "google.com")) {
+    await user.reauthenticateWithPopup(googleProvider);
+  } else {
+    const pass = prompt(t("reenterPassword"));
+    if (!pass) throw new Error("cancel");
+    await user.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(user.email, pass));
+  }
+}
+
 // ================================================================
 // LAUNCH APP
 // ================================================================
 async function launchApp(username, uid) {
+  if (launching) return; launching = true;
+  try { await launchAppInner(username, uid); } finally { launching = false; }
+}
+async function launchAppInner(username, uid) {
   currentUser = username;
   currentUID  = uid;
 
@@ -550,7 +594,7 @@ async function launchApp(username, uid) {
   } catch (err) {
     // Sin conexión: seguimos con lo que haya en la caché local del dispositivo
     console.error("No se pudo leer Firestore, se usa la copia local:", err);
-    data = { ledger:getLedger(username), goals:getGoals(username), bills:getBills(username), prefs:getUserPrefs(username) };
+    data = { ledger:getLedger(uid), goals:getGoals(uid), bills:getBills(uid), prefs:getUserPrefs(uid) };
   }
 
   ledger = data.ledger || [];
@@ -560,15 +604,15 @@ async function launchApp(username, uid) {
 
   // Guardamos una copia local (sin volver a mandarla a Firestore) para que la
   // app funcione también offline y como caché rápida.
-  saveLedger(username, ledger, { skipSync:true });
-  saveGoals(username, goals, { skipSync:true });
-  saveBills(username, bills, { skipSync:true });
-  saveUserPrefs(username, prefs, { skipSync:true });
+  saveLedger(uid, ledger, { skipSync:true });
+  saveGoals(uid, goals, { skipSync:true });
+  saveBills(uid, bills, { skipSync:true });
+  saveUserPrefs(uid, prefs, { skipSync:true });
 
   document.getElementById("loadingScreen").classList.add("hidden");
   document.getElementById("authScreen").classList.add("hidden");
   document.getElementById("appRoot").classList.remove("hidden");
-  document.getElementById("topbarName").innerHTML = '<i class="fa-solid fa-user"></i> ' + username;
+  document.getElementById("topbarName").innerHTML = '<i class="fa-solid fa-user"></i> ' + esc(username);
   document.getElementById("settingsUsername").textContent = username;
 
   applyTheme(prefs.theme);
@@ -581,6 +625,7 @@ async function launchApp(username, uid) {
 }
 
 function initAppListeners() {
+  if (listenersReady) return; listenersReady = true;
   // LOGOUT
   document.getElementById("logoutBtn").addEventListener("click", async () => {
     if (!confirm(t("confirmLogout"))) return;
@@ -625,7 +670,7 @@ function initAppListeners() {
     if (delBtn) {
       if (!confirm(t("confirmDelete"))) return;
       ledger = ledger.filter(l => l.id !== Number(delBtn.dataset.delete));
-      saveLedger(currentUser, ledger); renderMovements(); updateBalances();
+      saveLedger(currentUID, ledger); renderMovements(); updateBalances();
       return;
     }
     if (editBtn) {
@@ -670,7 +715,8 @@ function initAppListeners() {
     const btn = e.target.closest("[data-lang]");
     if (!btn) return;
     prefs.lang = btn.dataset.lang;
-    saveUserPrefs(currentUser, prefs);
+    try { localStorage.setItem("fin_lang", prefs.lang); } catch(e) {}
+    saveUserPrefs(currentUID, prefs);
     applyI18n();
     document.querySelectorAll("#langRow .option-btn").forEach(b => b.classList.toggle("active", b.dataset.lang === prefs.lang));
   });
@@ -681,7 +727,7 @@ function initAppListeners() {
     if (!btn) return;
     prefs.currency = btn.dataset.currency;
     prefs.symbol   = btn.dataset.symbol;
-    saveUserPrefs(currentUser, prefs);
+    saveUserPrefs(currentUID, prefs);
     updateBalances(); renderUpcoming();
     document.querySelectorAll("#currencyRow .option-btn").forEach(b => b.classList.toggle("active", b.dataset.currency === prefs.currency));
   });
@@ -690,7 +736,7 @@ function initAppListeners() {
   document.getElementById("gowImageBtn").addEventListener("click", () => {
     const url = document.getElementById("gowImageUrl").value.trim();
     prefs.gowImage = url;
-    saveUserPrefs(currentUser, prefs);
+    saveUserPrefs(currentUID, prefs);
     applyGowImage(url);
   });
 
@@ -700,6 +746,7 @@ function initAppListeners() {
     const user = fbAuth.currentUser;
     if (!user) return;
 
+    try { await reauthUser(user); } catch (e0) { if (!e0 || e0.message !== "cancel") alert(firebaseErrorMessage(e0)); return; }
     const doDelete = async () => {
       await fbDb.collection("users").doc(user.uid).delete();
       await user.delete();
@@ -725,10 +772,10 @@ function initAppListeners() {
       }
     }
 
-    localStorage.removeItem("fin_ledger_" + currentUser);
-    localStorage.removeItem("fin_goals_"  + currentUser);
-    localStorage.removeItem("fin_bills_"  + currentUser);
-    localStorage.removeItem("fin_prefs_"  + currentUser);
+    localStorage.removeItem("fin_ledger_" + currentUID);
+    localStorage.removeItem("fin_goals_"  + currentUID);
+    localStorage.removeItem("fin_bills_"  + currentUID);
+    localStorage.removeItem("fin_prefs_"  + currentUID);
     // fbAuth.onAuthStateChanged se dispara solo y muestra la pantalla de auth
   });
 }
@@ -750,7 +797,7 @@ function switchTab(name) {
 // ================================================================
 function openLoanModal(principal) {
   return new Promise(resolve => {
-    loanModalResolve = resolve;
+    loanModalResolve = resolve; loanPrincipal = principal;
 
     document.getElementById("modalLoanAmount").textContent = fmtMoney(principal);
     document.getElementById("modalTotalToPay").value   = "";
@@ -783,8 +830,7 @@ function openLoanModal(principal) {
 }
 
 function todayISO() {
-  const d = new Date();
-  return d.toISOString().slice(0, 10);
+  return localISO(new Date());
 }
 
 document.getElementById("modalCancel").addEventListener("click", () => {
@@ -796,9 +842,9 @@ document.getElementById("modalConfirm").addEventListener("click", () => {
   const total = Number(document.getElementById("modalTotalToPay").value);
   const inst  = Number(document.getElementById("modalInstallments").value);
   const dateV = document.getElementById("modalStartDate").value;
-  const principal = parseFloat(document.getElementById("modalLoanAmount").textContent.replace(/[^0-9.,]/g,"").replace(",","."));
+  const principal = loanPrincipal;
 
-  if (!total || total <= 0)  { alert(t("errLoanTotal")); return; }
+  if (!total || total <= principal || total > MAX_AMOUNT * 10)  { alert(t("errLoanTotal")); return; }
   if (!inst || inst < 1)     { alert(t("errLoanInstallments")); return; }
   if (!dateV)                { alert(t("errLoanDate")); return; }
 
@@ -810,8 +856,9 @@ document.getElementById("modalConfirm").addEventListener("click", () => {
   const start = new Date(dateV + "T12:00:00");
   for (let i = 0; i < inst; i++) {
     const d = new Date(start);
-    d.setMonth(d.getMonth() + i);
-    schedule.push({ num: i+1, date: d.toISOString().slice(0,10), amount: monthly, paid: false });
+    d.setDate(1); d.setMonth(start.getMonth() + i);
+    d.setDate(Math.min(start.getDate(), daysInMonth(d.getFullYear(), d.getMonth())));
+    schedule.push({ num: i+1, date: localISO(d), amount: monthly, paid: false });
   }
 
   document.getElementById("loanModal").classList.add("hidden");
@@ -887,7 +934,7 @@ async function addEntry(type) {
 
   const entry = {
     id: editingId || Date.now(),
-    date: new Date().toISOString(),
+    date: (editingId && (ledger.find(l => l.id === editingId) || {}).date) || new Date().toISOString(),
     description, amount, type, operationType, loanDetails, entries
   };
 
@@ -899,7 +946,7 @@ async function addEntry(type) {
   }
 
   ledger.sort((a, b) => new Date(b.date) - new Date(a.date));
-  saveLedger(currentUser, ledger);
+  saveLedger(currentUID, ledger);
   updateBalances();
   renderUpcoming();
   document.getElementById("amount").value = "";
@@ -931,15 +978,15 @@ function renderUpcoming() {
   upcoming.forEach(u => {
     const totalInst = u.loan.loanDetails.installments;
     const pct       = ((u.paidCount / totalInst) * 100).toFixed(0);
-    const alert     = u.diffDays <= 7;
-    const dateStr   = new Date(u.next.date + "T00:00:00").toLocaleDateString("es-AR", { day:"2-digit", month:"short", year:"numeric" });
+    const isSoon    = u.diffDays <= 7;
+    const dateStr   = new Date(u.next.date + "T00:00:00").toLocaleDateString(loc(), { day:"2-digit", month:"short", year:"numeric" });
     const pctInterest = u.loan.loanDetails.interestPercent;
 
     html += `
     <div class="upcoming-card">
-      <div class="upcoming-loan-name"><i class="fa-solid fa-credit-card" style="margin-right:8px;opacity:0.8"></i>${u.loan.description || t("loan")}</div>
-      <div class="upcoming-row ${alert ? "alert" : ""}">
-        <span>${t("dueOn")}</span><span>${dateStr} ${alert ? '<i class="fa-solid fa-triangle-exclamation"></i> ' + u.diffDays + "d" : ""}</span>
+      <div class="upcoming-loan-name"><i class="fa-solid fa-credit-card" style="margin-right:8px;opacity:0.8"></i>${esc(u.loan.description) || t("loan")}</div>
+      <div class="upcoming-row ${isSoon ? "alert" : ""}">
+        <span>${t("dueOn")}</span><span>${dateStr} ${isSoon ? '<i class="fa-solid fa-triangle-exclamation"></i> ' + u.diffDays + "d" : ""}</span>
       </div>
       <div class="upcoming-row">
         <span>${t("installmentOf")} ${u.paidCount + 1} ${t("of")} ${totalInst}</span>
@@ -959,7 +1006,7 @@ function renderUpcoming() {
         <div class="goal-percent">${pct}% ${t("paidSoFar").toLowerCase()}</div>
       </div>
       <button style="margin-top:10px;background:var(--bg3);color:var(--text);border-radius:10px;padding:8px;font-size:13px;width:100%"
-        data-payloan="${u.loan.id}"><i class="fa-solid fa-check"></i> Marcar cuota ${u.paidCount+1} como pagada</button>
+        data-payloan="${u.loan.id}"><i class="fa-solid fa-check"></i> ${t("markInstallment")} ${u.paidCount+1}</button>
     </div>`;
   });
   container.innerHTML = html;
@@ -971,8 +1018,13 @@ function renderUpcoming() {
       if (!loan) return;
       const unpaid = loan.loanDetails.schedule.find(s => !s.paid);
       if (!unpaid) return;
+      if (unpaid.amount > getAccountTotal("Caja")) { alert(t("errNoBalance")); return; }
       unpaid.paid = true;
-      saveLedger(currentUser, ledger);
+      ledger.push({ id:Date.now(), date:new Date().toISOString(), description:(loan.description || t("loan")) + " #" + unpaid.num,
+        amount:unpaid.amount, type:"expense", operationType:"loan", loanDetails:null,
+        entries:[{ account:"Prestamos", debit:unpaid.amount, credit:0 }, { account:"Caja", debit:0, credit:unpaid.amount }] });
+      ledger.sort((a, b) => new Date(b.date) - new Date(a.date));
+      saveLedger(currentUID, ledger);
       renderUpcoming();
       updateBalances();
     });
@@ -987,7 +1039,7 @@ function renderMovements() {
   const year  = currentDate.getFullYear();
   const month = currentDate.getMonth();
   document.getElementById("currentMonth").textContent =
-    currentDate.toLocaleString("es-AR", { month:"long", year:"numeric" });
+    currentDate.toLocaleString(loc(), { month:"long", year:"numeric" });
 
   const filtered = ledger.filter(l => { const d=new Date(l.date); return d.getFullYear()===year && d.getMonth()===month; });
   if (filtered.length === 0) { list.innerHTML = `<p style="opacity:0.5;text-align:center;margin-top:20px">${t("noMovements")}</p>`; return; }
@@ -1004,7 +1056,7 @@ function renderMovements() {
     if (l.loanDetails) {
       const paid = l.loanDetails.schedule ? l.loanDetails.schedule.filter(s=>s.paid).length : 0;
       loanInfo = `<div style="font-size:11px;color:var(--text2);margin-top:4px">
-        <i class="fa-regular fa-calendar"></i> ${paid}/${l.loanDetails.installments} cuotas · ${l.loanDetails.interestPercent}% interés · ${fmtMoney(l.loanDetails.monthly)}/mes
+        <i class="fa-regular fa-calendar"></i> ${paid}/${l.loanDetails.installments} ${t("installmentsWord")} · ${l.loanDetails.interestPercent}% ${t("interestWord")} · ${fmtMoney(l.loanDetails.monthly)}${t("perMonth")}
       </div>`;
     }
 
@@ -1012,9 +1064,9 @@ function renderMovements() {
     div.className = "movement";
     div.innerHTML = `
       <div class="amount" style="color:${color}">${sign}${fmtMoney(l.amount)}${tag}</div>
-      <div style="font-size:14px;opacity:0.8">${l.description || "Sin descripción"}</div>
+      <div style="font-size:14px;opacity:0.8">${esc(l.description) || t("noDesc")}</div>
       ${loanInfo}
-      <small>${d.toLocaleString("es-AR")}</small>
+      <small>${d.toLocaleString(loc())}</small>
       <div class="actions">
         <button data-edit="${l.id}"><i class="fa-solid fa-pen"></i></button>
         <button data-delete="${l.id}"><i class="fa-solid fa-trash-can"></i></button>
@@ -1031,8 +1083,8 @@ function downloadCSV() {
   const movs = ledger.filter(l => { const d=new Date(l.date); return d.getFullYear()===year && d.getMonth()===month; });
   if (movs.length === 0) { alert(t("noMovementsCSV")); return; }
   let csv = "Fecha,Descripcion,Cuenta,Debe,Haber\n";
-  movs.forEach(l => l.entries.forEach(e => { csv += `${l.date},"${l.description||""}",${e.account},${e.debit},${e.credit}\n`; }));
-  const blob = new Blob([csv], { type:"text/csv;charset=utf-8;" });
+  movs.forEach(l => l.entries.forEach(e => { csv += `${l.date},"${(l.description||"").replace(/"/g,'""')}",${e.account},${e.debit},${e.credit}\n`; }));
+  const blob = new Blob(["\ufeff" + csv], { type:"text/csv;charset=utf-8;" });
   const url  = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url; link.download = `libro_${month+1}_${year}.csv`;
@@ -1065,7 +1117,7 @@ function renderStats() {
   expenses.forEach(l => {
     const item = document.createElement("div");
     item.className = "top-expense-item";
-    item.innerHTML = `<span class="te-desc">${l.description||"Sin descripción"}</span><span class="te-amount">-${fmtMoney(l.amount)}</span>`;
+    item.innerHTML = `<span class="te-desc">${esc(l.description) || t("noDesc")}</span><span class="te-amount">-${fmtMoney(l.amount)}</span>`;
     topEl.appendChild(item);
   });
 }
@@ -1073,11 +1125,12 @@ function renderStats() {
 function renderBarChart() {
   const canvas = document.getElementById("barChart");
   const ctx    = canvas.getContext("2d");
+  if (!ctx.roundRect) ctx.roundRect = function(x,y,w,h){ this.rect(x,y,w,h); };
   const incomes=[], expenses=[], months=[];
   for (let i=5; i>=0; i--) {
     const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i);
     const y=d.getFullYear(), m=d.getMonth();
-    months.push(d.toLocaleString("es-AR",{month:"short"}));
+    months.push(d.toLocaleString(loc(),{month:"short"}));
     let inc=0, exp=0;
     ledger.forEach(l => { const ld=new Date(l.date); if(ld.getFullYear()===y&&ld.getMonth()===m){ if(l.type==="income"&&l.operationType==="normal")inc+=l.amount; if(l.type==="expense"&&l.operationType==="normal")exp+=l.amount; } });
     incomes.push(inc); expenses.push(exp);
@@ -1115,7 +1168,7 @@ function addGoal() {
   if (!target||target<=0){ alert(t("errGoalTarget")); return; }
   if (saved > target)  { alert(t("errGoalSaved")); return; }
   goals.push({ id:Date.now(), name, target, saved });
-  saveGoals(currentUser, goals); renderGoals();
+  saveGoals(currentUID, goals); renderGoals();
   document.getElementById("goalName").value   = "";
   document.getElementById("goalTarget").value = "";
   document.getElementById("goalSaved").value  = "";
@@ -1131,8 +1184,8 @@ function renderGoals() {
     const card=document.createElement("div");
     card.className="goal-card";
     card.innerHTML=`
-      <div class="goal-header"><span class="goal-name">${g.name}</span><button class="goal-delete" data-gdelete="${g.id}"><i class="fa-solid fa-xmark"></i></button></div>
-      <div class="goal-amounts">${fmtMoney(g.saved)} de ${fmtMoney(g.target)}${done?" · ✅ "+t("achieved"):""}</div>
+      <div class="goal-header"><span class="goal-name">${esc(g.name)}</span><button class="goal-delete" data-gdelete="${g.id}"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="goal-amounts">${fmtMoney(g.saved)} ${t("of")} ${fmtMoney(g.target)}${done?' · <i class="fa-solid fa-circle-check"></i> '+t("achieved"):""}</div>
       <div class="goal-bar-wrap"><div class="goal-bar-fill ${done?"done":""}" style="width:${pct}%"></div></div>
       <div class="goal-percent">${pct}%</div>
       <div class="goal-add-row">
@@ -1149,7 +1202,7 @@ function handleGoalClick(e) {
   if (delBtn) {
     if (!confirm(t("confirmDeleteGoal"))) return;
     goals = goals.filter(g => g.id !== Number(delBtn.dataset.gdelete));
-    saveGoals(currentUser, goals); renderGoals();
+    saveGoals(currentUID, goals); renderGoals();
   }
   if (addBtn) {
     const id=Number(addBtn.dataset.gaddBtn);
@@ -1157,7 +1210,7 @@ function handleGoalClick(e) {
     const val=Number(input.value);
     if (!val||val<=0){ input.focus(); return; }
     goals=goals.map(g=>g.id===id?{...g,saved:g.saved+val}:g);
-    saveGoals(currentUser,goals); renderGoals(); input.value="";
+    saveGoals(currentUID,goals); renderGoals(); input.value="";
   }
 }
 
@@ -1178,7 +1231,7 @@ function addBill() {
   if (!dueDay || dueDay < 1 || dueDay > 31) { alert(t("errBillDueDay")); return; }
 
   bills.push({ id:Date.now(), name, category:selectedBillCat, amount, dueDay, paidMonths:[] });
-  saveBills(currentUser, bills);
+  saveBills(currentUID, bills);
   renderBills();
   renderUpcomingBills();
 
@@ -1231,7 +1284,7 @@ function renderBills() {
   sorted.forEach(bill => {
     const info = computeBillStatus(bill);
     const cat  = BILL_CATEGORIES[bill.category] || BILL_CATEGORIES.other;
-    const dateStr = info.dueDate.toLocaleDateString("es-AR", { day:"2-digit", month:"short" });
+    const dateStr = info.dueDate.toLocaleDateString(loc(), { day:"2-digit", month:"short" });
 
     const card = document.createElement("div");
     card.className = "bill-card" + (info.status === "overdue" ? " is-overdue" : info.status === "soon" ? " is-soon" : "");
@@ -1239,7 +1292,7 @@ function renderBills() {
       <div class="bill-head">
         <div class="bill-cat-icon"><i class="fa-solid ${cat.icon}"></i></div>
         <div class="bill-info">
-          <div class="bill-name">${bill.name}</div>
+          <div class="bill-name">${esc(bill.name)}</div>
           <div class="bill-amount">${fmtMoney(bill.amount)} · ${t("every")}</div>
         </div>
         <button class="bill-delete" data-bdelete="${bill.id}"><i class="fa-solid fa-trash-can"></i></button>
@@ -1271,7 +1324,7 @@ function renderUpcomingBills() {
     const cat = BILL_CATEGORIES[bill.category] || BILL_CATEGORIES.other;
     html += `
     <div class="upcoming-card ${info.status === "overdue" ? "is-overdue" : ""}">
-      <div class="upcoming-loan-name"><span class="upcoming-cat-icon"><i class="fa-solid ${cat.icon}"></i></span>${bill.name}</div>
+      <div class="upcoming-loan-name"><span class="upcoming-cat-icon"><i class="fa-solid ${cat.icon}"></i></span>${esc(bill.name)}</div>
       <div class="upcoming-row ${info.status === "overdue" || info.status === "soon" ? "alert" : ""}">
         <span class="bill-status ${info.status}" style="padding:3px 8px">${billStatusLabel(info)}</span>
         <span>${fmtMoney(bill.amount)}</span>
@@ -1290,7 +1343,7 @@ function handleBillClick(e) {
   if (delBtn) {
     if (!confirm(t("confirmDeleteBill"))) return;
     bills = bills.filter(b => b.id !== Number(delBtn.dataset.bdelete));
-    saveBills(currentUser, bills);
+    saveBills(currentUID, bills);
     renderBills(); renderUpcomingBills();
     return;
   }
@@ -1311,7 +1364,7 @@ function markBillPaid(id) {
   if (bill.amount > caja) { alert(t("errNoBalance")); return; }
 
   bill.paidMonths.push(key);
-  saveBills(currentUser, bills);
+  saveBills(currentUID, bills);
 
   // Registrar el pago como egreso normal en el libro contable
   const entry = {
@@ -1326,7 +1379,7 @@ function markBillPaid(id) {
   };
   ledger.push(entry);
   ledger.sort((a, b) => new Date(b.date) - new Date(a.date));
-  saveLedger(currentUser, ledger);
+  saveLedger(currentUID, ledger);
 
   updateBalances();
   renderBills();
@@ -1338,6 +1391,11 @@ function markBillPaid(id) {
 // INICIO — Firebase decide si hay sesión activa (funciona en cualquier
 // dispositivo: PC, celular, etc., mientras sea el mismo usuario)
 // ================================================================
+try {
+  const saved = localStorage.getItem("fin_lang") || (navigator.language || "es").slice(0,2);
+  if (I18N[saved]) prefs.lang = saved;
+} catch (e) {}
+applyI18n();
 fbAuth.onAuthStateChanged(async (user) => {
   if (user) {
     const username = user.displayName || (user.email || "").split("@")[0];

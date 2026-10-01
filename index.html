@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f1115">
   <title>Finanzas</title>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,6 +29,9 @@
     <div class="auth-wrap">
       <div class="auth-logo"><i class="fa-solid fa-wallet"></i></div>
       <h1 class="auth-title" data-i18n="appName">Finanzas</h1>
+      <button id="googleBtn" class="btn-google" type="button"><i class="fa-brands fa-google"></i> <span data-i18n="google">Continuar con Google</span></button>
+      <div id="googleError" class="auth-error" style="text-align:center"></div>
+      <div class="auth-divider"><span data-i18n="or">o</span></div>
       <div class="auth-tabs">
         <button id="tabLoginBtn" class="auth-tab active" data-i18n="login">Entrar</button>
         <button id="tabRegisterBtn" class="auth-tab" data-i18n="register">Registrarse</button>
@@ -84,12 +88,12 @@
       <button class="topbar-logout" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i></button>
     </div>
     <nav class="tabs">
-      <button class="tab active" data-tab="home"><i class="fa-solid fa-house"></i></button>
-      <button class="tab" data-tab="movements"><i class="fa-solid fa-list-ul"></i></button>
-      <button class="tab" data-tab="stats"><i class="fa-solid fa-chart-simple"></i></button>
-      <button class="tab" data-tab="bills"><i class="fa-solid fa-file-invoice-dollar"></i></button>
-      <button class="tab" data-tab="goals"><i class="fa-solid fa-bullseye"></i></button>
-      <button class="tab" data-tab="settings"><i class="fa-solid fa-gear"></i></button>
+      <button class="tab active" data-tab="home"><i class="fa-solid fa-house"></i><span data-i18n="tabHome">Inicio</span></button>
+      <button class="tab" data-tab="movements"><i class="fa-solid fa-list-ul"></i><span data-i18n="tabMovements">Movimientos</span></button>
+      <button class="tab" data-tab="stats"><i class="fa-solid fa-chart-simple"></i><span data-i18n="tabStats">Estadísticas</span></button>
+      <button class="tab" data-tab="bills"><i class="fa-solid fa-file-invoice-dollar"></i><span data-i18n="tabBills">Cuentas</span></button>
+      <button class="tab" data-tab="goals"><i class="fa-solid fa-bullseye"></i><span data-i18n="tabGoals">Metas</span></button>
+      <button class="tab" data-tab="settings"><i class="fa-solid fa-gear"></i><span data-i18n="tabSettings">Ajustes</span></button>
     </nav>
 
     <!-- HOME -->
@@ -187,7 +191,7 @@
         <div class="settings-label" data-i18n="theme">Tema</div>
         <div class="theme-grid" id="themeGrid"></div>
         <div id="gowImageSection" class="gow-image-section hidden">
-          <div class="settings-label" style="margin-top:14px">🩸 Imagen de fondo (pega el link)</div>
+          <div class="settings-label" style="margin-top:14px"><i class="fa-solid fa-fire"></i> Imagen de fondo (pega el link)</div>
           <input type="url" id="gowImageUrl" placeholder="https://i.imgur.com/...">
           <button class="btn-main" id="gowImageBtn">Aplicar imagen</button>
         </div>
@@ -197,9 +201,9 @@
       <div class="settings-section">
         <div class="settings-label" data-i18n="language">Idioma</div>
         <div class="option-row" id="langRow">
-          <button class="option-btn active" data-lang="es">🇦🇷 Español</button>
-          <button class="option-btn" data-lang="pt">🇧🇷 Português</button>
-          <button class="option-btn" data-lang="en">🇺🇸 English</button>
+          <button class="option-btn active" data-lang="es"><i class="fa-solid fa-language"></i> Español</button>
+          <button class="option-btn" data-lang="pt"><i class="fa-solid fa-language"></i> Português</button>
+          <button class="option-btn" data-lang="en"><i class="fa-solid fa-language"></i> English</button>
         </div>
       </div>
 
@@ -207,9 +211,9 @@
       <div class="settings-section">
         <div class="settings-label" data-i18n="currency">Moneda</div>
         <div class="option-row" id="currencyRow">
-          <button class="option-btn active" data-currency="ARS" data-symbol="$">🇦🇷 Peso</button>
-          <button class="option-btn" data-currency="BRL" data-symbol="R$">🇧🇷 Real</button>
-          <button class="option-btn" data-currency="USD" data-symbol="US$">🇺🇸 Dólar</button>
+          <button class="option-btn active" data-currency="ARS" data-symbol="$"><i class="fa-solid fa-coins"></i> Peso</button>
+          <button class="option-btn" data-currency="BRL" data-symbol="R$"><i class="fa-solid fa-coins"></i> Real</button>
+          <button class="option-btn" data-currency="USD" data-symbol="US$"><i class="fa-solid fa-dollar-sign"></i> Dólar</button>
         </div>
       </div>
 
