@@ -233,6 +233,10 @@ const THEMES = [
   { id:"rose",     name:"Rose",     colors:["#fff1f2","#f43f5e","#ffffff"] },
   { id:"godofwar", name:"God of War", colors:["#1a0500","#c0392b","#3d0c00"] },
   { id:"bit16",    name:"16 Bits",    colors:["#1a1c2c","#3b5dc9","#ffcd75"] },
+  { id:"bit16g",   name:"16B Verde",  colors:["#0f380f","#306230","#9bbc0f"] },
+  { id:"bit16r",   name:"16B Rojo",   colors:["#1d0a0e","#e43b44","#feae34"] },
+  { id:"bit16p",   name:"16B Morado", colors:["#1b0b2e","#b55088","#f6757a"] },
+  { id:"win95",    name:"Win 95",     colors:["#008080","#c0c0c0","#000080"] },
   { id:"nineties", name:"90's",       colors:["#170b2e","#ff2e88","#00d9ff"] },
 ];
 
@@ -343,6 +347,7 @@ function applyI18n() {
 // ================================================================
 function applyTheme(themeId) {
   document.documentElement.setAttribute("data-theme", themeId);
+  document.documentElement.setAttribute("data-style", themeId.startsWith("bit16") ? "pixel" : themeId === "win95" ? "win95" : "");
   const isGow = themeId === "godofwar";
   document.getElementById("gowBg").classList.toggle("hidden", !isGow);
   document.getElementById("gowCanvas").classList.toggle("hidden", !isGow);
